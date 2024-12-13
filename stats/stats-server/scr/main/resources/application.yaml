@@ -1,0 +1,20 @@
+ server:
+   port: 9090
+   uri: "http://stats-server:9090"
+ spring:
+   main.banner-mode: OFF
+   jpa:
+     properties:
+       hibernate:
+         format_sql: true
+       jdbc.time_zone: UTC
+     database: POSTGRESQL
+     show-sql: true
+   sql.init.mode: always
+   datasource:
+     username: "postgres"
+     password: "password"
+     url: "jdbc:postgresql://localhost:5432/stats"
+     driver-class-name: "org.postgresql.Driver"
+ logging.level.org.springframework:
+    orm.jpa: INFO
