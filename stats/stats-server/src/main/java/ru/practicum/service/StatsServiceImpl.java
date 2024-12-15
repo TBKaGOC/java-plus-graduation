@@ -31,8 +31,12 @@ public class StatsServiceImpl implements StatsService {
     @Transactional
     public StatsRequestDto save(StatsRequestDto requestDto) {
         log.info("Save request to {}", requestDto);
-        var savedRequest = statsRepository.save(Mapper.toRequest(requestDto));
-        return Mapper.toRequestDto(savedRequest);
+        try {
+            var savedRequest = statsRepository.save(Mapper.toRequest(requestDto));
+            return Mapper.toRequestDto(savedRequest);
+        } catch (Exception e) {
+            throw new ValidationException(e.getMessage());
+        }
     }
 
     public List<StatsResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
