@@ -4,8 +4,8 @@ import ru.practicum.model.Requests;
 import ru.practicum.model.Response;
 
 // TODO
-import ru.practicum.StatsRequestDto;
-import ru.practicum.StatsResponseDto;
+import ru.practicum.dto.StatsRequestDto;
+import ru.practicum.dto.StatsResponseDto;
 
 public class Mapper {
     public static StatsRequestDto toRequestDto(Requests request) {
