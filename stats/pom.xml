@@ -19,6 +19,5 @@
         <module>stats-client</module>
         <module>stats-dto</module>
         <module>stats-server</module>
-        <module>stats-server/testModuleName</module>
     </modules>
 </project>
