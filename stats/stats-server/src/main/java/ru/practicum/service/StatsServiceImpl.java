@@ -17,9 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO
-import ru.practicum.StatsRequestDto;
-import ru.practicum.StatsResponseDto;
+import ru.practicum.dto.StatsRequestDto;
+import ru.practicum.dto.StatsResponseDto;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -31,7 +30,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Transactional
     public StatsRequestDto save(StatsRequestDto requestDto) {
-        log.info("Save request to ", requestDto);
+        log.info("Save request to {}", requestDto);
         var savedRequest = statsRepository.save(Mapper.toRequest(requestDto));
         return Mapper.toRequestDto(savedRequest);
     }

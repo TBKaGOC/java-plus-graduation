@@ -24,7 +24,7 @@ public interface StatsRepository extends JpaRepository<Requests, Integer> {
     );
 	
 	@Query(value = "SELECT new ru.practicum.model.Response(" +
-            "application, uri, COUNT(DISTINCTip) as total) " +
+            "application, uri, COUNT(DISTINCT ip) as total) " +
             "FROM Requests " +
             "WHERE moment between :start AND :end " +
             "GROUP BY application, uri " +
