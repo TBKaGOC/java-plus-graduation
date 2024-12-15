@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 
 
 @RequiredArgsConstructor
@@ -18,10 +19,11 @@ import java.util.Map;
 public class StatsClient {
     private final RestClient client;
 
-    public RestClient.ResponseSpec getAllStats(LocalDateTime start, LocalDateTime end, ArrayList<String> uris, Boolean unique) {
-        return client.get()
+    public Collection<StatsResponseDto> getAllStats(LocalDateTime start, LocalDateTime end, ArrayList<String> uris, Boolean unique) {
+        return Arrays.asList(Objects.requireNonNull(client.get()
                 .uri("/stats?start={start}&end={end}&uris={uris}&unique={unique}")
-                .retrieve();
+                .retrieve()
+                .body(StatsResponseDto[].class)));
     }
 
     public StatsResponseDto postStats(StatsRequestDto statsRequestDto) {
