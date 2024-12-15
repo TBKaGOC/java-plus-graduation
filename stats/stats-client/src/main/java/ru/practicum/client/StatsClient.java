@@ -21,7 +21,7 @@ public class StatsClient {
 
     public Collection<StatsResponseDto> getAllStats(LocalDateTime start, LocalDateTime end, ArrayList<String> uris, Boolean unique) {
         return Arrays.asList(Objects.requireNonNull(client.get()
-                .uri("/stats?start={start}&end={end}&uris={uris}&unique={unique}")
+                .uri("/stats?start=" + start + "&end=" + end + "&uris=" + uris + "&unique=" + unique)
                 .retrieve()
                 .body(StatsResponseDto[].class)));
     }
