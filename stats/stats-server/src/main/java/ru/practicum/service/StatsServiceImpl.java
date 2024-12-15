@@ -6,19 +6,16 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.dto.StatsRequestDto;
+import ru.practicum.dto.StatsResponseDto;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.mapper.Mapper;
-import ru.practicum.model.Requests;
 import ru.practicum.model.Response;
 import ru.practicum.repository.StatsRepository;
-import ru.practicum.service.StatsService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import ru.practicum.dto.StatsRequestDto;
-import ru.practicum.dto.StatsResponseDto;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -45,19 +42,19 @@ public class StatsServiceImpl implements StatsService {
         }
 
         List<Response> statistic;
-		if ((uris == null) || (uris.isEmpty())) {
-			if (unique) {
-				statistic = statsRepository.findAllUnique(start, end);
-			} else {
+        if ((uris == null) || (uris.isEmpty())) {
+            if (unique) {
+                statistic = statsRepository.findAllUnique(start, end);
+            } else {
                 statistic = statsRepository.findAll(start, end);
-			}
-		} else {
+            }
+        } else {
             if (unique) {
                 statistic = statsRepository.findUrisUnique(start, end, uris);
             } else {
                 statistic = statsRepository.findUris(start, end, uris);
             }
-		}
+        }
         return statistic.stream()
                 .map(Mapper::toResponseDto)
                 .collect(Collectors.toList());

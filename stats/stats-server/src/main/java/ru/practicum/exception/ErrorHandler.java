@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import ru.practicum.exception.ValidationException;
-import ru.practicum.exception.NotFoundException;
-
 import java.util.Map;
 
 @RestControllerAdvice
@@ -22,7 +19,7 @@ public class ErrorHandler {
         return Map.of("error", e.getMessage());
     }
 
-	@ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleWrongData(final NotFoundException e) {
         log.error("Not found: " + e.getMessage());
