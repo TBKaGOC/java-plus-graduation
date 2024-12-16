@@ -19,7 +19,6 @@
 
 	<modules>
 		<module>stats</module>
-		<module>main-server</module>
 	</modules>
 
 	<properties>
