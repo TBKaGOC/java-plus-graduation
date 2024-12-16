@@ -13,9 +13,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=explore
 
   main-server:
-    build: main-server
-    image: main-server
-    container_name: main-server
+    build: ewm-server
+    image: ewm-server
+    container_name: ewm-server
     ports:
       - "8080:8080"
 
