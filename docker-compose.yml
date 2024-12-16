@@ -12,6 +12,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=explore
       - SPRING_DATASOURCE_PASSWORD=explore
 
+  main-server:
+    build: main-server
+    image: main-server
+    container_name: main-server
+    ports:
+      - "8080:8080"
+
   stats-db:
     image: postgres:16.1
     container_name: explore-postgres
