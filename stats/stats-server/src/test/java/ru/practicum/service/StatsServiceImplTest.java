@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
         "spring.datasource.username=sa",
         "spring.datasource.password=password",
         "spring.sql.init.schema-locations=classpath:test-schema.sql"}) // тестовая схема может отличаться,
-        // если штатная БД будет не h2
+// если штатная БД будет не h2
 @DataJpaTest
 class StatsServiceImplTest {
     @Autowired
