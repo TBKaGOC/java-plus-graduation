@@ -22,8 +22,8 @@ public interface StatsRepository extends JpaRepository<Requests, Integer> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
-	
-	@Query(value = "SELECT new ru.practicum.model.Response(" +
+
+    @Query(value = "SELECT new ru.practicum.model.Response(" +
             "application, uri, COUNT(DISTINCT ip) as total) " +
             "FROM Requests " +
             "WHERE moment between :start AND :end " +
@@ -46,8 +46,8 @@ public interface StatsRepository extends JpaRepository<Requests, Integer> {
             @Param("end") LocalDateTime end,
             @Param("uris") List<String> uris
     );
-	
-	@Query(value = "SELECT new ru.practicum.model.Response(" +
+
+    @Query(value = "SELECT new ru.practicum.model.Response(" +
             "application, uri, COUNT(DISTINCT ip) as total) " +
             "FROM Requests " +
             "WHERE moment between :start AND :end " +
