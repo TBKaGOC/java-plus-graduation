@@ -26,6 +26,7 @@ public class NewEventDto {
     String description;
     LocalDateTime eventDate;
     Location location;
+    String state;
     Boolean paid;
     Integer participantLimit;
     Boolean requestModeration;

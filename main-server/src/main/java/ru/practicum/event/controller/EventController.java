@@ -24,7 +24,7 @@ public class EventController {
     @GetMapping("/{id}")
     public EventFullDto getEventById(@PathVariable Long id,
                                      HttpServletRequest request) {
-        return eventService.getEventDtoById(id, request.getRequestURI(), request.getRemoteAddr());
+        return eventService.getEventById(id, request.getRequestURI(), request.getRemoteAddr());
     }
 
     @GetMapping

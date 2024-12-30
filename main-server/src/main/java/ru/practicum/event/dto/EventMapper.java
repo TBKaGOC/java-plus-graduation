@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
 @UtilityClass
-public class EventDtoMapper {
+public class EventMapper {
 
     public static EventFullDto mapEventToFullDto(Event event, Long confirmed) {
         if (event.getState() == null) {
