@@ -25,4 +25,11 @@ public class ErrorHandler {
         log.error("Not found: " + e.getMessage());
         return Map.of("error", e.getMessage());
     }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> handleWrongData(final ConflictException e) {
+        log.error("Conflict: " + e.getMessage());
+        return Map.of("error", e.getMessage());
+    }
 }

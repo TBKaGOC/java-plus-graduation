@@ -58,11 +58,11 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public List<ResponseCompilationDto> getCompilations(Optional<Boolean> pinned, Integer from, Integer size) {
         if (pinned.isPresent()) {
-            return repository.findAllWithPinned(pinned.get(), Pageable.ofSize(size)).subList(from, size - 1)
+            return repository.findAllWithPinned(pinned.get(), Pageable.ofSize(size + from)).subList(from, size + from)
                     .stream().map(CompilationMapper::mapToResponseCompilation).collect(Collectors.toList());
         } else {
-            return repository.findAll(Pageable.ofSize(size)).map(CompilationMapper::mapToResponseCompilation)
-                    .stream().collect(Collectors.toList()).subList(from, size - 1);
+            return repository.findAll(Pageable.ofSize(size + from)).map(CompilationMapper::mapToResponseCompilation)
+                    .stream().collect(Collectors.toList()).subList(from, size + from);
         }
     }
 
