@@ -9,9 +9,11 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-	List<User> findByName(String name);
+    List<User> findByName(String name);
 
-	Boolean existsByName(String name);
+    User getUserById(Long id);
+
+    Boolean existsByName(String name);
 
     @Query("SELECT u FROM User u " +
             "WHERE(u.id in :ids)")

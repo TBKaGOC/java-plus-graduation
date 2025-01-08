@@ -3,6 +3,8 @@ package ru.practicum.request.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,4 +21,8 @@ public class EventRequestDto {
     Long requester;
 
     String created;
+
+    List<EventRequestDto> confirmedRequests;
+
+    List<EventRequestDto> rejectedRequests;
 }
