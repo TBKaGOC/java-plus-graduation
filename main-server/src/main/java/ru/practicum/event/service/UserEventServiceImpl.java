@@ -16,6 +16,7 @@ import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.repository.EventRepository;
+import ru.practicum.event.repository.LocationRepository;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.request.repository.RequestRepository;
@@ -38,6 +39,7 @@ public class UserEventServiceImpl implements UserEventService {
     final UserRepository userRepository;
     final CategoryRepository categoryRepository;
     final RequestRepository requestRepository;
+    final LocationRepository locationRepository;
 
     final StatsClient statsClient;
 
@@ -68,7 +70,7 @@ public class UserEventServiceImpl implements UserEventService {
             throw new ValidationException("До начала события меньше часа, изменение невозможно");
         }
 
-        eventRepository.saveLocation(event.getLocation().getLat(), event.getLocation().getLon());
+        locationRepository.save(event.getLocation());
         event = eventRepository.save(event);
 
         Long confirmedRequests = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
@@ -84,7 +86,7 @@ public class UserEventServiceImpl implements UserEventService {
             throw new ValidationException("Пользователь " + userId + " не инициатор события " + eventId);
         }
         event = updateEventFromEventDto(event, eventDto);
-        eventRepository.saveLocation(event.getLocation().getLat(), event.getLocation().getLon());
+        locationRepository.save(event.getLocation());
         eventRepository.save(event);
 
         Long confirmed = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));

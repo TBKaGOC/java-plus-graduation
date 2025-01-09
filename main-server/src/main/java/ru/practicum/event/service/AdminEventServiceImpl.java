@@ -14,6 +14,7 @@ import ru.practicum.event.dto.EventMapper;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.repository.EventRepository;
+import ru.practicum.event.repository.LocationRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
@@ -23,7 +24,6 @@ import ru.practicum.user.dto.UserMapper;
 import ru.practicum.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,23 +37,18 @@ public class AdminEventServiceImpl implements AdminEventService {
     final RequestRepository requestRepository;
     final UserRepository userRepository;
     final CategoryRepository categoryRepository;
+    final LocationRepository locationRepository;
 
     final StatsClient statsClient;
 
     @Override
-    public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
+    public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
 
-        LocalDateTime startDateTime = null;
-        LocalDateTime endDateTime = null;
         List<EventFullDto> eventDtos = null;
         List<EventState> eventStateList = null;
 
-        if (rangeStart != null) {
-            startDateTime = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        }
-        if (rangeEnd != null) {
-            endDateTime = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            if (startDateTime.isAfter(endDateTime)) {
+        if (rangeStart != null && rangeEnd != null) {
+            if (rangeStart.isAfter(rangeEnd)) {
                 throw new ValidationException("Время начала поиска позже времени конца поиска");
             }
         }
@@ -71,7 +66,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         }
 
         List<Event> allEventsWithDates = new ArrayList<>(eventRepository.findAllEventsWithDates(users,
-                eventStateList, categories, startDateTime, endDateTime, PageRequest.of(from / size, size)));
+                eventStateList, categories, rangeStart, rangeEnd, PageRequest.of(from / size, size)));
         List<EventRequest> requestsByEventIds = requestRepository.findByEventIds(allEventsWithDates.stream()
                 .mapToLong(Event::getId).boxed().collect(Collectors.toList()));
         eventDtos = allEventsWithDates.stream()
@@ -83,7 +78,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         if (!eventDtos.isEmpty()) {
             HashMap<Long, Integer> eventIdsWithViewsCounter = new HashMap<>();
-            LocalDateTime startTime = LocalDateTime.parse(eventDtos.getFirst().getCreatedOn().replace(" ", "T"));
+            LocalDateTime startTime = LocalDateTime.parse(eventDtos.get(0).getCreatedOn().replace(" ", "T"));
             ArrayList<String> uris = new ArrayList<>();
             for (EventFullDto dto : eventDtos) {
                 eventIdsWithViewsCounter.put(dto.getId(), 0);
@@ -130,9 +125,11 @@ public class AdminEventServiceImpl implements AdminEventService {
                 oldEvent.getState() != EventState.PENDING) {
             throw new ConflictException("Невозможно отменить событие " + eventId);
         }
-        if (ChronoUnit.HOURS.between(oldEvent.getPublishedOn(), oldEvent.getEventDate()) < 1) {
-            throw new ConflictException("Невозможно изменить событие" + eventId);
+
+        if (oldEvent.getState().equals("PUBLISHED") && ChronoUnit.HOURS.between(oldEvent.getPublishedOn(), oldEvent.getEventDate()) < 1) {
+            throw new ConflictException("Невозможно изменить событие " + eventId + ", так как разница между датой публикации и проведения менее 1 часа.");
         }
+
 
         Event newEvent = new Event();
         newEvent.setId(eventId);
@@ -156,7 +153,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         newEvent.setState(event.getState() != null ? EventState.valueOf(event.getState()) : oldEvent.getState());
         newEvent.setTitle(event.getTitle() != null ? event.getTitle() : oldEvent.getTitle());
 
-        eventRepository.saveLocation(newEvent.getLocation().getLat(), newEvent.getLocation().getLon());
+        locationRepository.save(newEvent.getLocation());
 
         return EventMapper.mapEventToFullDto(eventRepository.save(newEvent), event.getConfirmedRequests());
     }

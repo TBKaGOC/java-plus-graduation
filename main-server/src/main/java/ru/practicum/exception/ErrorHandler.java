@@ -16,7 +16,7 @@ public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        String errorMessage = e.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
+        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         assert errorMessage != null;
         Map<String, String> error = Map.of("error", errorMessage);
         log.warn("Validation error: {}", errorMessage);
