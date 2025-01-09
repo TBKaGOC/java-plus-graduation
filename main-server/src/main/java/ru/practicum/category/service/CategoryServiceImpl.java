@@ -35,28 +35,31 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.mapCategory(category);
     }
 
-    /* todo: 1) Уменьшение числа обращений к базе данных.
-    **       2) Устранение избыточных проверок.
-    **       3) Упрощение логики.
-    */
     @Override
     @Transactional
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
-
+        // Найти категорию по ID, либо выбросить исключение, если не найдена
         Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Указанная категория не найдена " + catId));
+                .orElseThrow(() -> new NotFoundException("Категория с ID " + catId + " не найдена."));
 
-        List<Category> categoryList = categoryRepository.findByName(categoryDto.getName());
+        // Проверить, существует ли другая категория с таким же именем
+        boolean categoryExists = categoryRepository.findByName(categoryDto.getName()).stream()
+                .anyMatch(c -> !c.getId().equals(catId));
 
-        if (!categoryList.isEmpty()) {
-            if (categoryList.getFirst().getId() != catId) {
-                throw new ValidationException(String.format("Нельзя задать имя категории %s поскольку такое имя уже задействовано", categoryDto.getName()));
-            }
+        if (categoryExists) {
+            throw new ValidationException(String.format(
+                    "Нельзя задать имя категории %s, поскольку такое имя уже используется.",
+                    categoryDto.getName()
+            ));
         }
 
+        // Обновить и сохранить изменения
         category.setName(categoryDto.getName());
-        return CategoryMapper.mapCategory(categoryRepository.save(category));
+        Category updatedCategory = categoryRepository.save(category);
+
+        return CategoryMapper.mapCategory(updatedCategory);
     }
+
 
     @Override
     public CategoryDto getCategoryById(Long catId) {
@@ -76,8 +79,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /* todo: 1) Уменьшение числа обращений к базе данных
-    **       2) Упрощение логики.
-    */
+     **       2) Упрощение логики.
+     */
     @Override
     @Transactional
     public void deleteCategory(Long catId) {
