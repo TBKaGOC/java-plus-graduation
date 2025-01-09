@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto addUser(UserDto newUserDto) {
-        if (!userRepository.existsByName(newUserDto.getName())) {
+        if (userRepository.existsByName(newUserDto.getName())) {
             throw new ValidationException(String.format("Пользователь %s уже существует", newUserDto.getName()));
         }
         User savedUser = userRepository.save(UserMapper.mapUserDto(newUserDto));
@@ -45,7 +45,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsersByIdList(List<Long> ids, Pageable page) {
-        return userRepository.findAllByIdsPageable(ids, page).stream()
+        List<User> users = (ids == null || ids.isEmpty()) ?
+                userRepository.findAll(page).getContent() :
+                userRepository.findAllByIdsPageable(ids, page);
+        return users.stream()
                 .map(UserMapper::mapUser)
                 .collect(Collectors.toList());
     }

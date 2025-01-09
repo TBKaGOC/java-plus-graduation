@@ -21,9 +21,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByInitiator(User user, Pageable page);
 
-    @Query(value = "INSERT INTO locations () valuse (:lat, :lon)", nativeQuery = true)
-    void saveLocation(Float lat, Float lon);
-
     @Query(value = "SELECT e FROM Event e " +
             "WHERE e.initiator IN :users " +
             "AND e.state IN :states " +
@@ -60,15 +57,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByCategoryIdPageable(List<Long> categories, EventState state, Pageable page);
 
     @Query("SELECT e FROM Event e " +
-            "WHERE (lower(e.annotation) LIKE %:text% " +
-            "OR lower(e.description) LIKE %:text%) " +
+            "WHERE (lower(e.annotation) LIKE :text " +
+            "OR lower(e.description) LIKE :text) " +
             "AND e.state = :state " +
             "ORDER BY e.eventDate DESC")
     List<Event> findEventsByText(String text, EventState state, Pageable page);
 
     @Query("SELECT e FROM Event e " +
-            "WHERE (lower(e.annotation) LIKE %:text% " +
-            "OR lower(e.description) LIKE %:text%) " +
+            "WHERE (lower(e.annotation) LIKE :text " +
+            "OR lower(e.description) LIKE :text) " +
             "AND e.eventDate >= :startDate " +
             "AND e.eventDate <= :endDate " +
             "AND e.state = :state " +

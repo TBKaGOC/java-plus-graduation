@@ -89,13 +89,13 @@ public class EventServiceImpl implements EventService {
                     text = "";
                 }
                 if (rangeEnd == null) {
-                    events = eventRepository.findEventsByText(text.toLowerCase(), EventState.PUBLISHED, PageRequest.of(from / size, size));
+                    events = eventRepository.findEventsByText("%" + text.toLowerCase() + "%", EventState.PUBLISHED, PageRequest.of(from / size, size));
                 } else {
                     endDate = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                     if (startDate.isAfter(endDate)) {
                         throw new ValidationException("Дата и время начала поиска не должна быть позже даты и времени конца поиска");
                     } else {
-                        events = eventRepository.findAllByTextAndDateRange(text.toLowerCase(),
+                        events = eventRepository.findAllByTextAndDateRange("%" + text.toLowerCase() + "%",
                                 startDate,
                                 endDate,
                                 EventState.PUBLISHED,
@@ -145,7 +145,7 @@ public class EventServiceImpl implements EventService {
     List<EventShortDto> createShortEventDtos(List<Event> events) {
         HashMap<Long, Integer> eventIdsWithViewsCounter = new HashMap<>();
 
-        LocalDateTime startTime = events.getFirst().getCreatedOn();
+        LocalDateTime startTime = events.get(0).getCreatedOn();
         ArrayList<String> uris = new ArrayList<>();
         for (Event event : events) {
             uris.add("/events/" + event.getId().toString());
