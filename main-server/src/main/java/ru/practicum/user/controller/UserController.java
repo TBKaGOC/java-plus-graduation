@@ -1,5 +1,6 @@
 package ru.practicum.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.user.dto.UserDto;
 import ru.practicum.user.service.UserService;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,8 +22,8 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getUsersList(@RequestParam(required = false) List<Long> ids,
-                             @RequestParam(required = false, defaultValue = "0") Integer from,
-                             @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                      @RequestParam(required = false, defaultValue = "0") Integer from,
+                                      @RequestParam(required = false, defaultValue = "10") Integer size) {
         return userService.getUsersByIdList(ids, PageRequest.of(from / size, size));
     }
 

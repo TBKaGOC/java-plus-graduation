@@ -35,6 +35,10 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.mapCategory(category);
     }
 
+    /* todo: 1) Уменьшение числа обращений к базе данных.
+    **       2) Устранение избыточных проверок.
+    **       3) Упрощение логики.
+    */
     @Override
     @Transactional
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
@@ -63,11 +67,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> getAllCategorys(Integer from, Integer size) {
-        return categoryRepository.findAll(PageRequest.of(from / size, size)).getContent()
-                .stream().map(CategoryMapper::mapCategory).collect(Collectors.toList());
+    public List<CategoryDto> getAllCategories(Integer from, Integer size) {
+        return categoryRepository.findAll(PageRequest.of(from / size, size))
+                .getContent()
+                .stream()
+                .map(CategoryMapper::mapCategory)
+                .collect(Collectors.toList());
     }
 
+    /* todo: 1) Уменьшение числа обращений к базе данных
+    **       2) Упрощение логики.
+    */
     @Override
     @Transactional
     public void deleteCategory(Long catId) {

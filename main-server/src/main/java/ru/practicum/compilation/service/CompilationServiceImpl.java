@@ -55,17 +55,29 @@ public class CompilationServiceImpl implements CompilationService {
         ));
     }
 
+    /* todo: 1) Уменьшение числа обращений к базе данных
+    **       2) Упрощение логики.
+    */
     @Override
     public List<ResponseCompilationDto> getCompilations(Optional<Boolean> pinned, Integer from, Integer size) {
         if (pinned.isPresent()) {
-            return repository.findAllWithPinned(pinned.get(), Pageable.ofSize(size + from)).subList(from, size + from)
-                    .stream().map(CompilationMapper::mapToResponseCompilation).collect(Collectors.toList());
+            return repository.findAllWithPinned(pinned.get(), Pageable.ofSize(size + from))
+                    .subList(from, size + from)
+                    .stream()
+                    .map(CompilationMapper::mapToResponseCompilation)
+                    .collect(Collectors.toList());
         } else {
-            return repository.findAll(Pageable.ofSize(size + from)).map(CompilationMapper::mapToResponseCompilation)
-                    .stream().collect(Collectors.toList()).subList(from, size + from);
+            return repository.findAll(Pageable.ofSize(size + from))
+                    .map(CompilationMapper::mapToResponseCompilation)
+                    .stream()
+                    .collect(Collectors.toList())
+                    .subList(from, size + from);
         }
     }
 
+    /* todo: 1) Уменьшение числа обращений к базе данных
+    **       2) Упрощение логики.
+    */
     @Override
     public void deleteCompilation(Long id) {
         Compilation compilation = repository.findById(id)

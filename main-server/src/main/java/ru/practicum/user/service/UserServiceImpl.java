@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.exception.ValidationException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
 import ru.practicum.user.dto.UserDto;
 import ru.practicum.user.dto.UserMapper;
 import ru.practicum.user.model.User;
@@ -36,11 +36,11 @@ public class UserServiceImpl implements UserService {
         return UserMapper.mapUser(savedUser);
     }
 
-	@Override
+    @Override
     public UserDto getUserById(Long userId) {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
-	    return UserMapper.mapUser(user);
+        return UserMapper.mapUser(user);
     }
 
     @Override

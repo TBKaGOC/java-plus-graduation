@@ -80,6 +80,9 @@ public class EventRequestServiceImpl implements EventRequestService {
                 .collect(Collectors.toList());
     }
 
+    /* todo: 1) Уменьшение числа обращений к базе данных
+    **       2) Упрощение логики.
+    */
     @Override
     @Transactional
     public EventRequestDto updateRequest(Long userId,
@@ -99,7 +102,9 @@ public class EventRequestServiceImpl implements EventRequestService {
 
 
         for (EventRequest request : requests) {
-            if (request.getStatus().equals(CONFIRMED_REQUEST) || request.getStatus().equals(REJECTED_REQUEST) || request.getStatus().equals(PENDING_REQUEST)) {
+            if (request.getStatus().equals(CONFIRMED_REQUEST) ||
+                    request.getStatus().equals(REJECTED_REQUEST) ||
+                    request.getStatus().equals(PENDING_REQUEST)) {
 
                 if (updateRequest.getStatus().equals(CONFIRMED_REQUEST) && event.getParticipantLimit() != 0) {
                     if (event.getParticipantLimit() < confirmedRequestsCounter) {
@@ -135,7 +140,7 @@ public class EventRequestServiceImpl implements EventRequestService {
 
         requestRepository.saveAll(result);
 
-        return eventRequestMapper.mapRequestWithConfirmedsAndRejecteds(confirmedRequests, rejectedRequests);
+        return eventRequestMapper.mapRequestWithConfirmedAndRejected(confirmedRequests, rejectedRequests);
     }
 
     @Override

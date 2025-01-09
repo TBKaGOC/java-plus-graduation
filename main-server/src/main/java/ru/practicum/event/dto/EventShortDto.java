@@ -2,12 +2,12 @@ package ru.practicum.event.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.user.dto.UserDto;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter

@@ -17,11 +17,11 @@ import java.time.LocalDateTime;
 public class EventFullDto {
 
     Long id;
-	@Size(min = 1, max = 128)
+    @Size(min = 1, max = 128)
     String title;
-	@Size(min = 1, max = 1024)
+    @Size(min = 1, max = 1024)
     String annotation;
-	@Size(min = 1, max = 1024)
+    @Size(min = 1, max = 1024)
     String description;
     String state;
     CategoryDto category;

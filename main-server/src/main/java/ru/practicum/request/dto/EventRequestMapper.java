@@ -15,12 +15,12 @@ public class EventRequestMapper {
         dto.setRequester(request.getRequester().getId());
         dto.setEvent(request.getEvent().getId());
         dto.setCreated(request.getCreated().toString());
-		dto.setStatus(request.getStatus());
+        dto.setStatus(request.getStatus());
         return dto;
     }
 
-    public EventRequestDto mapRequestWithConfirmedsAndRejecteds(List<EventRequestDto> confirmedRequests,
-                                                                                     List<EventRequestDto> rejectedRequests) {
+    public EventRequestDto mapRequestWithConfirmedAndRejected(List<EventRequestDto> confirmedRequests,
+                                                              List<EventRequestDto> rejectedRequests) {
         EventRequestDto result = new EventRequestDto();
         result.setConfirmedRequests(confirmedRequests);
         result.setRejectedRequests(rejectedRequests);

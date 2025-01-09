@@ -1,11 +1,11 @@
 package ru.practicum.event.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.event.model.Location;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,7 +18,7 @@ public class NewEventDto {
     @NotBlank
     @Size(min = 1, max = 1024)
     String annotation;
-	Long category;
+    Long category;
     @Size(min = 1, max = 128)
     String title;
     @NotBlank

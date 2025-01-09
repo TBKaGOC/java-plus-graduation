@@ -1,6 +1,7 @@
 package ru.practicum.event.service;
 
-import ru.practicum.event.dto.*;
+import ru.practicum.event.dto.EventFullDto;
+
 import java.util.List;
 
 public interface AdminEventService {
