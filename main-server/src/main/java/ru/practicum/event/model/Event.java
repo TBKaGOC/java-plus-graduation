@@ -27,9 +27,6 @@ public class Event {
     String annotation;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinTable(name = "events_categories",
-            joinColumns = @JoinColumn(name = "event"),
-            inverseJoinColumns = @JoinColumn(name = "category"))
     Category category;
 
     @Column(name = "created_on")

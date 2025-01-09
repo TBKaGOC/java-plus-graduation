@@ -19,9 +19,9 @@ spring:
     log-startup-info: false
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/main-service
-    username: vxuser
-    password: vxpasswd
+    url: jdbc:postgresql://localhost:6433/explore-main
+    username: explore-main
+    password: explore-main
 logging:
   level:
     org:

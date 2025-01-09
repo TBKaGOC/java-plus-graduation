@@ -24,7 +24,7 @@ public class UserController {
     public List<UserDto> getUsersList(@RequestParam(required = false) List<Long> ids,
                                       @RequestParam(required = false, defaultValue = "0") Integer from,
                                       @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return userService.getUsersByIdList(ids, PageRequest.of(from / size, size));
+        return userService.getUsersByIdList(ids, PageRequest.of(from, size));
     }
 
     @PostMapping
