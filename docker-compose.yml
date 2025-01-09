@@ -8,19 +8,47 @@ services:
     depends_on:
       - stats-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://explore-postgres:5432/explore
-      - SPRING_DATASOURCE_USERNAME=explore
-      - SPRING_DATASOURCE_PASSWORD=explore
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://explore-postgres-stats:5432/explore-stats
+      - SPRING_DATASOURCE_USERNAME=explore-stats
+      - SPRING_DATASOURCE_PASSWORD=explore-stats
 
   stats-db:
     image: postgres:16.1
-    container_name: explore-postgres
+    container_name: explore-postgres-stats
     ports:
       - "6432:5432"
     environment:
-      - POSTGRES_PASSWORD=explore
-      - POSTGRES_USER=explore
-      - POSTGRES_DB=explore
+      - POSTGRES_PASSWORD=explore-stats
+      - POSTGRES_USER=explore-stats
+      - POSTGRES_DB=explore-stats
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  main-server:
+    build: main-server
+    image: main-server
+    container_name: main-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://explore-postgres-main:5432/explore-main
+      - SPRING_DATASOURCE_USERNAME=explore-main
+      - SPRING_DATASOURCE_PASSWORD=explore-main
+
+  main-db:
+    image: postgres:16.1
+    container_name: explore-postgres-main
+    ports:
+      - "6433:5432"
+    environment:
+      - POSTGRES_PASSWORD=explore-main
+      - POSTGRES_USER=explore-main
+      - POSTGRES_DB=explore-main
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
