@@ -1,11 +1,9 @@
 package ru.practicum.client;
 
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,8 +43,8 @@ public class StatsClient {
         return response != null ? Arrays.asList(response) : List.of();
     }
 
-    public StatsResponseDto postStats(StatsRequestDto statsRequestDto) {
-        return Optional.ofNullable(client.post()
+    public void postStats(StatsRequestDto statsRequestDto) {
+        Optional.ofNullable(client.post()
                         .uri("/hit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(statsRequestDto)
