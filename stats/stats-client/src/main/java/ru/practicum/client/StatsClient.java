@@ -43,8 +43,8 @@ public class StatsClient {
         return response != null ? Arrays.asList(response) : List.of();
     }
 
-    public void postStats(StatsRequestDto statsRequestDto) {
-        Optional.ofNullable(client.post()
+    public StatsResponseDto postStats(StatsRequestDto statsRequestDto) {
+        return Optional.ofNullable(client.post()
                         .uri("/hit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(statsRequestDto)
