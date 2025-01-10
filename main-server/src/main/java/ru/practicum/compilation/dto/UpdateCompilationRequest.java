@@ -1,6 +1,6 @@
 package ru.practicum.compilation.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,8 +13,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NewCompilationDto {
-    @NotBlank
+public class UpdateCompilationRequest {
+
+    @Size(max = 50)
     String title;
 
     List<Long> events;

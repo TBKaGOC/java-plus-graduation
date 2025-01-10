@@ -22,19 +22,19 @@ public class EventFullDto {
     String title;
     @Size(min = 1, max = 1024)
     String annotation;
+    CategoryDto category;
+    Boolean paid;
+    LocalDateTime eventDate;
+    UserDto initiator;
     @Size(min = 1, max = 1024)
     String description;
-    String state;
-    CategoryDto category;
-    Long confirmedRequests;
-    String createdOn;
-    String publishedOn;
-    UserDto initiator;
-    @JsonIgnore
-    Location location;
-    LocalDateTime eventDate;
-    Boolean paid;
-    Boolean requestModeration;
     Integer participantLimit;
+    String state;
+    String createdOn;
+//    @JsonIgnore
+    Location location;
+    Boolean requestModeration;
+    Long confirmedRequests;
+    String publishedOn;
     Integer views;
 }

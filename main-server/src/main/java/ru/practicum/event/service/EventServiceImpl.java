@@ -51,7 +51,7 @@ public class EventServiceImpl implements EventService {
         var confirmed = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
         EventFullDto eventFullDto = EventMapper.mapEventToFullDto(event, confirmed);
 
-        ArrayList<String> urls = new ArrayList<>(List.of("/events/" + eventFullDto.getId()));
+        List<String> urls = Collections.singletonList(uri);
         LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
         LocalDateTime end = LocalDateTime.now();
         var views = statsClient.getAllStats(start, end, urls, true).size();

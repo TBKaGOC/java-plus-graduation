@@ -165,7 +165,12 @@ public class UserEventServiceImpl implements UserEventService {
             event.setDescription(inpEventDto.getDescription());
         }
         if (inpEventDto.getEventDate() != null) {
-            event.setEventDate(LocalDateTime.parse(inpEventDto.getEventDate(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME)));
+            LocalDateTime updateEventDate = LocalDateTime.parse(inpEventDto.getEventDate(),
+                    DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
+            if (LocalDateTime.now().isAfter(updateEventDate)) {
+                throw new ValidationException("Нельзя установить дату из прошлого.");
+            }
+            event.setEventDate(updateEventDate);
         }
         if (inpEventDto.getLocation() != null) {
             event.setLocation(inpEventDto.getLocation());

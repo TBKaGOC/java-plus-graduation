@@ -114,7 +114,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     @Override
     public EventFullDto updateEvent(Long eventId, UpdateEventUserRequest eventDto) {
-        log.info("Users...");
+        log.info("Admin...");
         log.info("Редактирование данных события и его статуса");
         Event event = getEventById(eventId);
         validationEventDate(event);
@@ -161,7 +161,12 @@ public class AdminEventServiceImpl implements AdminEventService {
             event.setDescription(inpEventDto.getDescription());
         }
         if (inpEventDto.getEventDate() != null) {
-            event.setEventDate(LocalDateTime.parse(inpEventDto.getEventDate(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME)));
+            LocalDateTime updateEventDate = LocalDateTime.parse(inpEventDto.getEventDate(),
+                    DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
+            if (LocalDateTime.now().isAfter(updateEventDate)) {
+                throw new ValidationException("Нельзя установить дату из прошлого.");
+            }
+            event.setEventDate(updateEventDate);
         }
         if (inpEventDto.getLocation() != null) {
             event.setLocation(inpEventDto.getLocation());
