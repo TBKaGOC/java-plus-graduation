@@ -80,9 +80,6 @@ public class EventRequestServiceImpl implements EventRequestService {
                 .collect(Collectors.toList());
     }
 
-    /* todo: 1) Уменьшение числа обращений к базе данных
-    **       2) Упрощение логики.
-    */
     @Override
     @Transactional
     public EventRequestDto updateRequest(Long userId,
