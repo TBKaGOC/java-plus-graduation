@@ -10,6 +10,8 @@ import ru.practicum.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
+import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -26,7 +28,7 @@ public class EventShortDto {
     UserDto initiator;
 
     @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     LocalDateTime eventDate;
 
     Boolean paid;

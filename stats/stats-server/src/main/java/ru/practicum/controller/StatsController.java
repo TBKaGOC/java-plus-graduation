@@ -14,10 +14,12 @@ import ru.practicum.service.StatsService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
+
 @RestController
 @Slf4j
 public class StatsController {
-    public static final String JSON_FORMAT_PATTERN_FOR_TIME = "yyyy-MM-dd HH:mm:ss";
+
     final StatsService statsService;
 
     @Autowired

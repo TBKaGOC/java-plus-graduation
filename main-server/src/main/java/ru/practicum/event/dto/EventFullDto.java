@@ -1,5 +1,6 @@
 package ru.practicum.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,7 @@ public class EventFullDto {
     String createdOn;
     String publishedOn;
     UserDto initiator;
+    @JsonIgnore
     Location location;
     LocalDateTime eventDate;
     Boolean paid;

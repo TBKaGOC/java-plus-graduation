@@ -10,6 +10,8 @@ import ru.practicum.user.dto.UserMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
+
 @UtilityClass
 public class EventMapper {
 
@@ -66,6 +68,6 @@ public class EventMapper {
         if (time == null) {
             return null;
         }
-        return time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return time.format(DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
     }
 }

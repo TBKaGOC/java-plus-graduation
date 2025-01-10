@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.client.StatsClient;
-import ru.practicum.event.dto.EventFullDto;
-import ru.practicum.event.dto.EventMapper;
-import ru.practicum.event.dto.EventShortDto;
-import ru.practicum.event.dto.NewEventDto;
+import ru.practicum.event.dto.*;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
+import ru.practicum.event.model.StateAction;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.event.repository.LocationRepository;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
+import ru.practicum.exception.WrongDataException;
 import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
@@ -28,6 +28,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 
 @Service
 @Slf4j
@@ -45,17 +47,22 @@ public class UserEventServiceImpl implements UserEventService {
 
     @Override
     public EventFullDto addEvent(Long userId, NewEventDto eventDto) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+        log.info("Users...");
+        log.info("Добавление нового события пользователем {}", userId);
+        User user = getUserById(userId);
         Category category = categoryRepository.findById(eventDto.getCategory()).orElseThrow(
                 () -> new NotFoundException("Категория не найдена " + eventDto.getCategory())
         );
 
         Event event = EventMapper.mapNewEventDtoToEvent(eventDto, category);
 
+        locationRepository.save(event.getLocation());
+
         event.setInitiator(user);
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
+
+        Long confirmedRequests = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
 
         if (event.getPaid() == null) {
             event.setPaid(false);
@@ -66,37 +73,62 @@ public class UserEventServiceImpl implements UserEventService {
         if (event.getRequestModeration() == null) {
             event.setRequestModeration(true);
         }
+        validationEventDate(event);
+        event = eventRepository.save(event);
+        log.info("Событие сохранено {}", event.getId());
+
+        EventFullDto eventFullDto = EventMapper.mapEventToFullDto(event, confirmedRequests);
+        return eventFullDto;
+    }
+
+    private static void validationEventDate(Event event) {
         if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(1))) {
             throw new ValidationException("До начала события меньше часа, изменение невозможно");
         }
-
-        locationRepository.save(event.getLocation());
-        event = eventRepository.save(event);
-
-        Long confirmedRequests = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
-        return EventMapper.mapEventToFullDto(event, confirmedRequests);
+        if (event.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new WrongDataException("Событие уже завершилось");
+        }
     }
 
     @Override
-    public EventFullDto updateEvent(Long userId, Long eventId, NewEventDto eventDto) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+    public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest eventDto) {
+        log.info("Users...");
+        log.info("Редактирование данных события и его статуса");
         Event event = getEventById(eventId);
-        if (!user.getId().equals(event.getInitiator().getId())) {
-            throw new ValidationException("Пользователь " + userId + " не инициатор события " + eventId);
+        User user = getUserById(userId);
+        validationEventInitiator(user, event);
+        validationEventDate(event);
+
+        if (!event.getState().equals(EventState.PENDING)) {
+            throw new ConflictException("Событие не в состоянии \"Ожидание публикации\", изменение события невозможно");
         }
-        event = updateEventFromEventDto(event, eventDto);
+        if ((!StateAction.REJECT_EVENT.toString().equals(eventDto.getStateAction())
+                && event.getState().equals(EventState.PUBLISHED))) {
+            throw new ConflictException("Отклонить опубликованное событие невозможно");
+        }
+
+        updateEventFromEventDto(event, eventDto);
         locationRepository.save(event.getLocation());
         eventRepository.save(event);
-
         Long confirmed = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
         return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed));
     }
 
-    @Override
-    public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer count) {
+    private static void validationEventInitiator(User user, Event event) {
+        if (!user.getId().equals(event.getInitiator().getId())) {
+            throw new ValidationException("Пользователь " + user.getId() + " не инициатор события " + event.getId());
+        }
+    }
+
+    private User getUserById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+        return user;
+    }
+
+    @Override
+    public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer count) {
+        User user = getUserById(userId);
         return eventRepository.findAllByInitiator(user, PageRequest.of(from / count, count)).stream()
                 .map(EventMapper::mapEventToShortDto)
                 .collect(Collectors.toList());
@@ -104,8 +136,7 @@ public class UserEventServiceImpl implements UserEventService {
 
     @Override
     public EventFullDto getEventById(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+        User user = getUserById(userId);
         Event event = getEventById(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new ValidationException("Пользователь " + userId + " не является инициатором события " + eventId);
@@ -121,7 +152,7 @@ public class UserEventServiceImpl implements UserEventService {
                 () -> new NotFoundException("Событие " + eventId + " не найдено"));
     }
 
-    Event updateEventFromEventDto(Event event, NewEventDto inpEventDto) {
+    void updateEventFromEventDto(Event event, UpdateEventUserRequest inpEventDto) {
         if (inpEventDto.getAnnotation() != null) {
             event.setAnnotation(inpEventDto.getAnnotation());
         }
@@ -134,7 +165,7 @@ public class UserEventServiceImpl implements UserEventService {
             event.setDescription(inpEventDto.getDescription());
         }
         if (inpEventDto.getEventDate() != null) {
-            event.setEventDate(inpEventDto.getEventDate());
+            event.setEventDate(LocalDateTime.parse(inpEventDto.getEventDate(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME)));
         }
         if (inpEventDto.getLocation() != null) {
             event.setLocation(inpEventDto.getLocation());
@@ -148,12 +179,12 @@ public class UserEventServiceImpl implements UserEventService {
         if (inpEventDto.getRequestModeration() != null) {
             event.setRequestModeration(inpEventDto.getRequestModeration());
         }
-        if (inpEventDto.getState() != null) {
-            switch (inpEventDto.getState().toUpperCase()) {
+        if (inpEventDto.getStateAction() != null) {
+            switch (inpEventDto.getStateAction().toUpperCase()) {
                 case "PUBLISH_EVENT":
                     event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
                     break;
-                case "REJECT_EVENT":
                 case "CANCEL_REVIEW":
                     event.setState(EventState.CANCELED);
                     break;
@@ -164,18 +195,17 @@ public class UserEventServiceImpl implements UserEventService {
                     throw new ValidationException("Неверное состояние события, не удалось обновить");
             }
         }
-        if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(2))) {
-            throw new ValidationException("До начала события осталось меньше 2 часов " + event.getId());
-        }
-        if (event.getState().equals(EventState.PUBLISHED)) {
-            throw new ValidationException("Нельзя изменить опубликованное событие " + event.getId());
-        }
-        return event;
+//        if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(2))) {
+//            throw new ValidationException("До начала события осталось меньше 2 часов " + event.getId());
+//        }
+//        if (event.getState().equals(EventState.PUBLISHED)) {
+//            throw new ValidationException("Нельзя изменить опубликованное событие " + event.getId());
+//        }
     }
 
     EventFullDto getViewsCounter(EventFullDto eventFullDto) {
         ArrayList<String> urls = new ArrayList<>(List.of("/events/" + eventFullDto.getId()));
-        LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
         LocalDateTime end = LocalDateTime.now();
 
         Integer views = statsClient.getAllStats(start, end, urls, true).size();

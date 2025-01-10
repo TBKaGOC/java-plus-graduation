@@ -20,11 +20,10 @@ import ru.practicum.request.repository.RequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 
 @Service
 @Slf4j
@@ -53,7 +52,7 @@ public class EventServiceImpl implements EventService {
         EventFullDto eventFullDto = EventMapper.mapEventToFullDto(event, confirmed);
 
         ArrayList<String> urls = new ArrayList<>(List.of("/events/" + eventFullDto.getId()));
-        LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
         LocalDateTime end = LocalDateTime.now();
         var views = statsClient.getAllStats(start, end, urls, true).size();
         eventFullDto.setViews(views);
@@ -83,7 +82,7 @@ public class EventServiceImpl implements EventService {
                 if (rangeStart == null) {
                     startDate = LocalDateTime.now();
                 } else {
-                    startDate = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    startDate = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
                 }
                 if (text == null) {
                     text = "";
@@ -91,7 +90,7 @@ public class EventServiceImpl implements EventService {
                 if (rangeEnd == null) {
                     events = eventRepository.findEventsByText("%" + text.toLowerCase() + "%", EventState.PUBLISHED, PageRequest.of(from / size, size));
                 } else {
-                    endDate = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    endDate = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
                     if (startDate.isAfter(endDate)) {
                         throw new ValidationException("Дата и время начала поиска не должна быть позже даты и времени конца поиска");
                     } else {
@@ -107,12 +106,12 @@ public class EventServiceImpl implements EventService {
             if (rangeStart == null) {
                 startDate = LocalDateTime.now();
             } else {
-                startDate = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                startDate = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
             }
             if (rangeEnd == null) {
                 endDate = null;
             } else {
-                endDate = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                endDate = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
             }
             if (rangeStart != null && rangeEnd != null) {
                 if (startDate.isAfter(endDate)) {
@@ -135,7 +134,7 @@ public class EventServiceImpl implements EventService {
                     shortEventDtos = shortEventDtos.subList(from, shortEventDtos.size());
                 }
             } else {
-                shortEventDtos.clear();
+                shortEventDtos = Collections.emptyList();
             }
             return shortEventDtos;
         }
@@ -145,7 +144,7 @@ public class EventServiceImpl implements EventService {
     List<EventShortDto> createShortEventDtos(List<Event> events) {
         HashMap<Long, Integer> eventIdsWithViewsCounter = new HashMap<>();
 
-        LocalDateTime startTime = events.get(0).getCreatedOn();
+        LocalDateTime startTime = events.getFirst().getCreatedOn();
         ArrayList<String> uris = new ArrayList<>();
         for (Event event : events) {
             uris.add("/events/" + event.getId().toString());
