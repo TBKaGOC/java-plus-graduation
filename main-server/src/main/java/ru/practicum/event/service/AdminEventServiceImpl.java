@@ -110,51 +110,52 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     @Override
     public EventFullDto updateEvent(Long eventId, EventFullDto event) {
-        Event oldEvent = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Искомое событие не найдено " + eventId)
-        );
+        Event oldEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Искомое событие не найдено " + eventId));
 
-        if (event.getState() != null &&
-                event.getState().equals("PUBLISHED") &&
-                oldEvent.getState() != EventState.PENDING) {
-            throw new ConflictException("Невозможно опубликовать событие " + eventId);
+        String newState = event.getState();
+        if (newState != null) {
+            if (newState.equals("PUBLISHED") && oldEvent.getState() != EventState.PENDING) {
+                throw new ConflictException("Невозможно опубликовать событие " + eventId);
+            }
+            if (newState.equals("CANCELED") && oldEvent.getState() != EventState.PENDING) {
+                throw new ConflictException("Невозможно отменить событие " + eventId);
+            }
         }
 
-        if (event.getState() != null &&
-                event.getState().equals("CANCELED") &&
-                oldEvent.getState() != EventState.PENDING) {
-            throw new ConflictException("Невозможно отменить событие " + eventId);
+        if (oldEvent.getState() == EventState.PUBLISHED &&
+                ChronoUnit.HOURS.between(oldEvent.getPublishedOn(), oldEvent.getEventDate()) < 1) {
+            throw new ConflictException("Невозможно изменить событие " + eventId +
+                    ", так как разница между датой публикации и проведения менее 1 часа.");
         }
-
-        if (oldEvent.getState().equals("PUBLISHED") && ChronoUnit.HOURS.between(oldEvent.getPublishedOn(), oldEvent.getEventDate()) < 1) {
-            throw new ConflictException("Невозможно изменить событие " + eventId + ", так как разница между датой публикации и проведения менее 1 часа.");
-        }
-
 
         Event newEvent = new Event();
         newEvent.setId(eventId);
-        newEvent.setAnnotation(event.getAnnotation() != null ? event.getAnnotation() : oldEvent.getAnnotation());
-        newEvent.setCategory(event.getCategory() != null ?
-                CategoryMapper.mapCategoryDto(event.getCategory()) : oldEvent.getCategory());
-        newEvent.setCreatedOn(event.getCreatedOn() != null ?
-                LocalDateTime.parse(event.getCreatedOn()) : oldEvent.getCreatedOn());
-        newEvent.setDescription(event.getDescription() != null ? event.getDescription() : oldEvent.getDescription());
-        newEvent.setEventDate(event.getEventDate() != null ? event.getEventDate() : oldEvent.getEventDate());
-        newEvent.setInitiator(event.getInitiator() != null ?
-                UserMapper.mapUserDto(event.getInitiator()) : oldEvent.getInitiator());
-        newEvent.setLocation(event.getLocation() != null ? event.getLocation() : oldEvent.getLocation());
-        newEvent.setPaid(event.getPaid() != null ? event.getPaid() : oldEvent.getPaid());
-        newEvent.setParticipantLimit(event.getParticipantLimit() != null ?
-                event.getParticipantLimit() : oldEvent.getParticipantLimit());
-        newEvent.setPublishedOn(event.getPublishedOn() != null ?
-                LocalDateTime.parse(event.getPublishedOn()) : oldEvent.getPublishedOn());
-        newEvent.setRequestModeration(event.getRequestModeration() != null ?
-                event.getRequestModeration() : oldEvent.getRequestModeration());
-        newEvent.setState(event.getState() != null ? EventState.valueOf(event.getState()) : oldEvent.getState());
-        newEvent.setTitle(event.getTitle() != null ? event.getTitle() : oldEvent.getTitle());
+        newEvent.setAnnotation(Optional.ofNullable(event.getAnnotation()).orElse(oldEvent.getAnnotation()));
+        newEvent.setCategory(Optional.ofNullable(event.getCategory())
+                .map(CategoryMapper::mapCategoryDto)
+                .orElse(oldEvent.getCategory()));
+        newEvent.setCreatedOn(Optional.ofNullable(event.getCreatedOn())
+                .map(LocalDateTime::parse)
+                .orElse(oldEvent.getCreatedOn()));
+        newEvent.setDescription(Optional.ofNullable(event.getDescription()).orElse(oldEvent.getDescription()));
+        newEvent.setEventDate(Optional.ofNullable(event.getEventDate()).orElse(oldEvent.getEventDate()));
+        newEvent.setInitiator(Optional.ofNullable(event.getInitiator())
+                .map(UserMapper::mapUserDto)
+                .orElse(oldEvent.getInitiator()));
+        newEvent.setLocation(Optional.ofNullable(event.getLocation()).orElse(oldEvent.getLocation()));
+        newEvent.setPaid(Optional.ofNullable(event.getPaid()).orElse(oldEvent.getPaid()));
+        newEvent.setParticipantLimit(Optional.ofNullable(event.getParticipantLimit()).orElse(oldEvent.getParticipantLimit()));
+        newEvent.setPublishedOn(Optional.ofNullable(event.getPublishedOn())
+                .map(LocalDateTime::parse)
+                .orElse(oldEvent.getPublishedOn()));
+        newEvent.setRequestModeration(Optional.ofNullable(event.getRequestModeration()).orElse(oldEvent.getRequestModeration()));
+        newEvent.setState(Optional.ofNullable(newState).map(EventState::valueOf).orElse(oldEvent.getState()));
+        newEvent.setTitle(Optional.ofNullable(event.getTitle()).orElse(oldEvent.getTitle()));
 
         locationRepository.save(newEvent.getLocation());
 
         return EventMapper.mapEventToFullDto(eventRepository.save(newEvent), event.getConfirmedRequests());
     }
+
 }
