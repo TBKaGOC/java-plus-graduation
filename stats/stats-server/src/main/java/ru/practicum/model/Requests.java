@@ -5,10 +5,13 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 
+import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
+
 @Entity
-@Table(name = "requests")
+@Table(name = "hits")
 @Getter
 @Setter
 @ToString
@@ -30,7 +33,7 @@ public class Requests {
     @Column(nullable = false)
     String ip;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     @Column(nullable = false)
     LocalDateTime moment;
 }
