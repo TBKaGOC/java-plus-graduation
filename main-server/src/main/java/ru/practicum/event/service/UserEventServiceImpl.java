@@ -45,6 +45,21 @@ public class UserEventServiceImpl implements UserEventService {
 
     final StatsClient statsClient;
 
+    private static void validationEventDate(Event event) {
+        if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(1))) {
+            throw new ValidationException("До начала события меньше часа, изменение невозможно");
+        }
+        if (event.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new WrongDataException("Событие уже завершилось");
+        }
+    }
+
+    private static void validationEventInitiator(User user, Event event) {
+        if (!user.getId().equals(event.getInitiator().getId())) {
+            throw new ValidationException("Пользователь " + user.getId() + " не инициатор события " + event.getId());
+        }
+    }
+
     @Override
     public EventFullDto addEvent(Long userId, NewEventDto eventDto) {
         log.info("Users...");
@@ -77,17 +92,7 @@ public class UserEventServiceImpl implements UserEventService {
         event = eventRepository.save(event);
         log.info("Событие сохранено {}", event.getId());
 
-        EventFullDto eventFullDto = EventMapper.mapEventToFullDto(event, confirmedRequests);
-        return eventFullDto;
-    }
-
-    private static void validationEventDate(Event event) {
-        if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(1))) {
-            throw new ValidationException("До начала события меньше часа, изменение невозможно");
-        }
-        if (event.getEventDate().isBefore(LocalDateTime.now())) {
-            throw new WrongDataException("Событие уже завершилось");
-        }
+        return EventMapper.mapEventToFullDto(event, confirmedRequests);
     }
 
     @Override
@@ -99,9 +104,6 @@ public class UserEventServiceImpl implements UserEventService {
         validationEventInitiator(user, event);
         validationEventDate(event);
 
-        if (!event.getState().equals(EventState.PENDING)) {
-            throw new ConflictException("Событие не в состоянии \"Ожидание публикации\", изменение события невозможно");
-        }
         if ((!StateAction.REJECT_EVENT.toString().equals(eventDto.getStateAction())
                 && event.getState().equals(EventState.PUBLISHED))) {
             throw new ConflictException("Отклонить опубликованное событие невозможно");
@@ -114,16 +116,9 @@ public class UserEventServiceImpl implements UserEventService {
         return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed));
     }
 
-    private static void validationEventInitiator(User user, Event event) {
-        if (!user.getId().equals(event.getInitiator().getId())) {
-            throw new ValidationException("Пользователь " + user.getId() + " не инициатор события " + event.getId());
-        }
-    }
-
     private User getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
+        return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Пользователь с id " + userId + " не найден"));
-        return user;
     }
 
     @Override

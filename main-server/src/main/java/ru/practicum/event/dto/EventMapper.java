@@ -26,7 +26,7 @@ public class EventMapper {
         eventFullDto.setConfirmedRequests(confirmed);
         eventFullDto.setCreatedOn(getLocalDateTime(event.getCreatedOn()));
         eventFullDto.setDescription(event.getDescription());
-        eventFullDto.setEventDate(event.getEventDate());
+        eventFullDto.setEventDate(event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         eventFullDto.setInitiator(UserMapper.mapUser(event.getInitiator()));
         eventFullDto.setLocation(event.getLocation());
         eventFullDto.setPaid(event.getPaid());
@@ -55,7 +55,8 @@ public class EventMapper {
         event.setAnnotation(newEvent.getAnnotation());
         event.setCategory(category);
         event.setDescription(newEvent.getDescription());
-        event.setEventDate(newEvent.getEventDate());
+        event.setEventDate(LocalDateTime.parse(newEvent.getEventDate(),
+                DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME)));
         event.setLocation(newEvent.getLocation());
         event.setPaid(newEvent.getPaid());
         event.setParticipantLimit(newEvent.getParticipantLimit());

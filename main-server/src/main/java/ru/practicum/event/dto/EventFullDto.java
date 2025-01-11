@@ -7,8 +7,6 @@ import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.event.model.Location;
 import ru.practicum.user.dto.UserDto;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,14 +21,13 @@ public class EventFullDto {
     String annotation;
     CategoryDto category;
     Boolean paid;
-    LocalDateTime eventDate;
+    String eventDate;
     UserDto initiator;
     @Size(min = 1, max = 1024)
     String description;
     Integer participantLimit;
     String state;
     String createdOn;
-    //    @JsonIgnore
     Location location;
     Boolean requestModeration;
     Long confirmedRequests;

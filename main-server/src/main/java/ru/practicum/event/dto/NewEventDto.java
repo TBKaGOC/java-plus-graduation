@@ -8,8 +8,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.event.model.Location;
 
-import java.time.LocalDateTime;
-
 import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 
 @Getter
@@ -29,7 +27,7 @@ public class NewEventDto {
     @Size(min = 20)
     String description;
     @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
-    LocalDateTime eventDate;
+    String eventDate;
     Location location;
     String state;
     Boolean paid;
