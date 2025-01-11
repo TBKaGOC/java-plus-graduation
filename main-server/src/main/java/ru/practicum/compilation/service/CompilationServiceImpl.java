@@ -89,19 +89,18 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public ResponseCompilationDto getCompilationById(Long id) {
-        return CompilationMapper.mapToResponseCompilation(compilationRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Указанная подборка не найдена " + id)
-        ));
+        log.info("Получение информации о подборке, id={}", id);
+        Compilation compilation = compilationRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Подборка не найдена " + id)
+        );
+        return compileDtoWithEvents(compilation);
     }
 
     @Override
     public List<ResponseCompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         log.info("pinned {}", pinned);
         List<Compilation> allWithPinned = compilationRepository.findAllWithPinned(pinned, Pageable.ofSize(size + from));
-        return allWithPinned
-                .stream()
-                .map(CompilationMapper::mapToResponseCompilation)
-                .collect(Collectors.toList());
+        return compileDtosWithEvents(allWithPinned);
     }
 
     @Override
@@ -113,5 +112,22 @@ public class CompilationServiceImpl implements CompilationService {
         } catch (Exception e) {
             throw new ValidationException("Невозможно удаление используемой категории события " + e.getMessage());
         }
+    }
+
+    private List<ResponseCompilationDto> compileDtosWithEvents(List<Compilation> compilations) {
+
+        return compilations.stream()
+                .map(this::compileDtoWithEvents)
+                .collect(Collectors.toList());
+    }
+
+    private ResponseCompilationDto compileDtoWithEvents(Compilation compilation) {
+        ResponseCompilationDto result = CompilationMapper.mapToResponseCompilation(compilation);
+        List<EventShortDto> eventDtos = new ArrayList<>();
+        for (Event event : compilation.getEvents()) {
+            eventDtos.add(EventMapper.mapEventToShortDto(event));
+        }
+        result.setEvents(eventDtos);
+        return result;
     }
 }
