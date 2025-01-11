@@ -81,4 +81,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND e.state = :state " +
             "ORDER BY e.eventDate DESC")
     List<Event> findEventList(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, EventState state);
+
+    boolean existsByCategoryId(Long catId);
 }

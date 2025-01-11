@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.exception.ValidationException;
 import ru.practicum.user.dto.UserDto;
 import ru.practicum.user.dto.UserMapper;
 import ru.practicum.user.model.User;
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto addUser(UserDto newUserDto) {
         if (userRepository.existsByName(newUserDto.getName())) {
-            throw new ValidationException(String.format("Пользователь %s уже существует", newUserDto.getName()));
+            throw new ConflictException(String.format("Пользователь %s уже существует", newUserDto.getName()));
         }
         User savedUser = userRepository.save(UserMapper.mapUserDto(newUserDto));
         return UserMapper.mapUser(savedUser);

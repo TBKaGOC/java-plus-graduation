@@ -14,9 +14,10 @@ public class CompilationMapper {
     }
 
     public static ResponseCompilationDto mapToResponseCompilation(Compilation compilation) {
-        return new ResponseCompilationDto(compilation.getId(),
-                compilation.getPinned(),
-                compilation.getTitle(),
-                compilation.getEvents());
+        return ResponseCompilationDto.builder()
+                .id(compilation.getId())
+                .pinned(compilation.getPinned())
+                .title(compilation.getTitle())
+                .build();
     }
 }

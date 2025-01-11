@@ -11,8 +11,9 @@ import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.dto.CategoryMapper;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
+import ru.practicum.event.repository.EventRepository;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.exception.ValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,12 +25,13 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     final CategoryRepository categoryRepository;
+    final EventRepository eventRepository;
 
     @Override
     @Transactional
     public CategoryDto addCategory(CategoryDto categoryDto) {
         if (categoryRepository.existsByName(categoryDto.getName())) {
-            throw new ValidationException("Такая категория событий уже существует");
+            throw new ConflictException("Такая категория событий уже существует");
         }
         var category = categoryRepository.save(CategoryMapper.mapCategoryDto(categoryDto));
         return CategoryMapper.mapCategory(category);
@@ -47,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .anyMatch(c -> !c.getId().equals(catId));
 
         if (categoryExists) {
-            throw new ValidationException(String.format(
+            throw new ConflictException(String.format(
                     "Нельзя задать имя категории %s, поскольку такое имя уже используется.",
                     categoryDto.getName()
             ));
@@ -78,18 +80,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.toList());
     }
 
-    /* todo: 1) Уменьшение числа обращений к базе данных
-     **       2) Упрощение логики.
-     */
     @Override
     @Transactional
     public void deleteCategory(Long catId) {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Указанная категория не найдена " + catId));
-        try {
+        if (!eventRepository.existsByCategoryId(catId)) {
             categoryRepository.deleteById(catId);
-        } catch (Exception e) {
-            throw new ValidationException("Невозможно удаление используемой категории события " + e.getMessage());
+        } else {
+            throw new ConflictException("Невозможно удаление используемой категории события ");
         }
     }
 }

@@ -16,7 +16,7 @@ public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        String errorMessage = e.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
         assert errorMessage != null;
         Map<String, String> error = Map.of("error", errorMessage);
         log.warn("Validation error: {}", errorMessage);
@@ -38,7 +38,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(ConflictException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleWrongData(final ConflictException e) {
         log.error("Conflict: " + e.getMessage());
         return Map.of("error", e.getMessage());

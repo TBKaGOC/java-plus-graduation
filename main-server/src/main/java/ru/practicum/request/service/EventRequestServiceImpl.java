@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.repository.EventRepository;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.request.dto.EventRequestDto;
@@ -43,18 +44,18 @@ public class EventRequestServiceImpl implements EventRequestService {
         Event event = getEventById(eventId);
 
         if (event.getInitiator().getId().equals(userId)) {
-            throw new ValidationException("Создатель события не может подать заявку на участие");
+            throw new ConflictException("Создатель события не может подать заявку на участие");
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ValidationException("Событие не опубликовано");
+            throw new ConflictException("Событие не опубликовано");
         }
         List<EventRequest> requests = getEventRequestsByEventId(event.getId());
         if (participationLimitIsFull(event)) {
-            throw new ValidationException("Превышен лимит заявок на участие в событии");
+            throw new ConflictException("Превышен лимит заявок на участие в событии");
         }
         for (EventRequest request : requests) {
             if (request.getRequester().getId().equals(userId)) {
-                throw new ValidationException("Повторная заявка на участие в событии");
+                throw new ConflictException("Повторная заявка на участие в событии");
             }
         }
 
@@ -108,12 +109,12 @@ public class EventRequestServiceImpl implements EventRequestService {
 
                         pending.stream().peek(p -> p.setStatus(REJECTED_REQUEST)).collect(Collectors.toList());
 
-                        throw new ValidationException("Превышено число возможных заявок на участие");
+                        throw new ConflictException("Превышено число возможных заявок на участие");
                     }
                 }
 
                 if (updateRequest.getStatus().equals(REJECTED_REQUEST) && request.getStatus().equals(CONFIRMED_REQUEST)) {
-                    throw new ValidationException("Нельзя отменить подтверждённую заявку");
+                    throw new ConflictException("Нельзя отменить подтверждённую заявку");
                 }
 
                 request.setStatus(updateRequest.getStatus());
@@ -177,7 +178,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     private boolean participationLimitIsFull(Event event) {
         Long confirmedRequestsCounter = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED", "ACCEPTED"));
         if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= confirmedRequestsCounter) {
-            throw new ValidationException("Превышено число заявок на участие");
+            throw new ConflictException("Превышено число заявок на участие");
         }
         return false;
     }

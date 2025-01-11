@@ -27,7 +27,7 @@ public class Compilation {
 
     @ManyToMany
     @JoinTable(name = "events_compilations",
-            joinColumns = @JoinColumn(name = "event"),
-            inverseJoinColumns = @JoinColumn(name = "compilation"))
+            joinColumns = @JoinColumn(name = "compilation"),
+            inverseJoinColumns = @JoinColumn(name = "event"))
     List<Event> events;
 }

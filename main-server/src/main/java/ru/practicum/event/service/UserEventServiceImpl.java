@@ -200,12 +200,6 @@ public class UserEventServiceImpl implements UserEventService {
                     throw new ValidationException("Неверное состояние события, не удалось обновить");
             }
         }
-//        if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(2))) {
-//            throw new ValidationException("До начала события осталось меньше 2 часов " + event.getId());
-//        }
-//        if (event.getState().equals(EventState.PUBLISHED)) {
-//            throw new ValidationException("Нельзя изменить опубликованное событие " + event.getId());
-//        }
     }
 
     EventFullDto getViewsCounter(EventFullDto eventFullDto) {

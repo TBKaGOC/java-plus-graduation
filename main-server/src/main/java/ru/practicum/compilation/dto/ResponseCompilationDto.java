@@ -1,11 +1,8 @@
 package ru.practicum.compilation.dto;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.event.model.Event;
+import ru.practicum.event.dto.EventShortDto;
 
 import java.util.List;
 
@@ -13,9 +10,10 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class ResponseCompilationDto {
     Long id;
-    Boolean pinned;
     String title;
-    List<Event> events;
+    Boolean pinned;
+    List<EventShortDto> events;
 }
