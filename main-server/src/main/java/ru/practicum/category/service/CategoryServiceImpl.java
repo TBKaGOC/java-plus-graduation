@@ -83,8 +83,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long catId) {
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Указанная категория не найдена " + catId));
+        if (!categoryRepository.existsById(catId)) {
+            throw new NotFoundException(String.format("Категория с id=%d не существует", catId));
+        }
+
         if (!eventRepository.existsByCategoryId(catId)) {
             categoryRepository.deleteById(catId);
         } else {

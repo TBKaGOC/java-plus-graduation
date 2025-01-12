@@ -65,7 +65,7 @@ public class EventRequestServiceImpl implements EventRequestService {
 
     @Override
     public List<EventRequestDto> getUserRequests(Long userId) {
-        if (null == userRepository.getUserById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь не найден userId=" + userId);
         }
         return requestRepository.findByUserId(userId).stream()
@@ -145,7 +145,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     @Transactional
     public EventRequestDto cancelRequest(Long userId, Long requestId) {
 
-        if (null == userRepository.getUserById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь не найден userId=" + userId);
         }
 
