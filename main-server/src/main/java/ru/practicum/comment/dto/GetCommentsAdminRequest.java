@@ -1,16 +1,12 @@
 package ru.practicum.comment.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
+@Builder
 public class GetCommentsAdminRequest {
     private Long eventId;
     private Integer from;

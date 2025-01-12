@@ -12,13 +12,14 @@ import java.util.List;
 public class CommentMapper {
 
     public CommentDto mapToCommentDto(final Comment comment) {
-        return new CommentDto()
-                .setId(comment.getId())
-                .setUserId(comment.getUser().getId())
-                .setEventId(comment.getEvent().getId())
-                .setContent(comment.getContent())
-                .setCreated(comment.getCreated())
-                .setInitiator(comment.isInitiator());
+        return CommentDto.builder()
+                .id(comment.getId())
+                .userId(comment.getUser().getId())
+                .eventId(comment.getEvent().getId())
+                .content(comment.getContent())
+                .created(comment.getCreated())
+                .isInitiator(comment.isInitiator())
+                .build();
     }
 
     public List<CommentDto> mapToCommentDto(final List<Comment> comments) {
@@ -31,10 +32,11 @@ public class CommentMapper {
     }
 
     public Comment mapTo(final CommentDto comment, final User user, final Event event) {
-        return new Comment()
-                .setId(comment.getId())
-                .setUser(user)
-                .setEvent(event)
-                .setContent(comment.getContent());
+        return Comment.builder()
+                .id(comment.getId())
+                .user(user)
+                .event(event)
+                .content(comment.getContent())
+                .build();
     }
 }

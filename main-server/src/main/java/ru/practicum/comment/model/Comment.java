@@ -1,6 +1,5 @@
 package ru.practicum.comment.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +13,7 @@ import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.event.model.Event;
 import ru.practicum.user.model.User;
@@ -31,7 +25,7 @@ import ru.practicum.user.model.User;
 @AllArgsConstructor
 @Table(name = "comment")
 @EqualsAndHashCode(of = "id")
-@Accessors(chain = true)
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
 
