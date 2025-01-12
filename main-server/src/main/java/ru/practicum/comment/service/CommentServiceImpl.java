@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.comment.dto.CommentDto;
 import ru.practicum.comment.dto.GetCommentsAdminRequest;
-import ru.practicum.comment.mapper.CommentMapper;
+import ru.practicum.comment.dto.CommentMapper;
 import ru.practicum.comment.model.Comment;
 import ru.practicum.comment.repository.CommentRepository;
 import ru.practicum.event.enums.State;
@@ -32,9 +32,12 @@ public class CommentServiceImpl implements CommentService {
     private final EventRepository eventRepository;
 
     @Override
-    public CommentDto addComment(final CommentDto commentDto) {
-        User user = fetchUser(commentDto.getUserId());
-        Event event = fetchEvent(commentDto.getEventId());
+    public CommentDto addComment(final CommentDto commentDto, Long userId, Long eventId) throws NotFoundException, ConflictException {
+        commentDto.setUserId(userId);
+        commentDto.setEventId(eventId);
+
+        User user = fetchUser(userId);
+        Event event = fetchEvent(eventId);
         if (!State.PUBLISHED.equals(event.getState())) {
             log.warn("Невозможно добавить комментарий к событию, которое не опубликовано, состояние события = {}",
                     event.getState());
@@ -51,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void delete(final Long userId, final Long commentId) {
+    public void delete(final Long userId, final Long commentId) throws NotFoundException, ConflictException {
         Comment comment = fetchComment(commentId);
 
         if (!comment.getUser().getId().equals(userId)) {
@@ -61,14 +64,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void delete(final Long commentId) {
+    public void delete(final Long commentId) throws NotFoundException {
         Comment comment = fetchComment(commentId);
         commentRepository.delete(comment);
     }
 
     @Override
     public CommentDto updateUserComment(final Long userId, final Long commentId,
-                                        final CommentDto commentDto) {
+                                        final CommentDto commentDto) throws NotFoundException, ConflictException {
         Comment comment = fetchComment(commentId);
         fetchUser(userId);
 
@@ -84,14 +87,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CommentDto> getAllUserComments(final Long userId) {
+    public List<CommentDto> getAllUserComments(final Long userId) throws NotFoundException {
         User user = fetchUser(userId);
         return CommentMapper.mapToCommentDto(commentRepository.findByUserId(user.getId()));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<CommentDto> getAllEventComments(final GetCommentsAdminRequest param) {
+    public List<CommentDto> getAllEventComments(final GetCommentsAdminRequest param) throws NotFoundException {
         final List<Comment> comments =
                 getEventComments(param.getEventId(), param.getFrom(), param.getSize());
         return CommentMapper.mapToCommentDto(comments);
@@ -99,11 +102,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CommentDto> getAllEventComments(final Long eventId, final int from, final int size) {
+    public List<CommentDto> getAllEventComments(final Long eventId, final int from, final int size) throws NotFoundException {
         return CommentMapper.mapToCommentDto(getEventComments(eventId, from, size));
     }
 
-    private List<Comment> getEventComments(final Long eventId, final int from, final int size) {
+    private List<Comment> getEventComments(final Long eventId, final int from, final int size) throws NotFoundException {
         if (!eventRepository.existsById(eventId)) {
             log.warn("Событие с идентификатором {} не существует в базе данных.", eventId);
             throw new NotFoundException("Событие не найдено.");
@@ -112,7 +115,7 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findAllByEventId(eventId, page).getContent();
     }
 
-    private User fetchUser(final Long userId) {
+    private User fetchUser(final Long userId) throws NotFoundException {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("Пользователь с идентификатором {} не найден.", userId);
@@ -120,7 +123,7 @@ public class CommentServiceImpl implements CommentService {
                 });
     }
 
-    private Event fetchEvent(final Long eventId) {
+    private Event fetchEvent(final Long eventId) throws NotFoundException {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.warn("Событие с идентификатором {} не найдено.", eventId);
@@ -128,7 +131,7 @@ public class CommentServiceImpl implements CommentService {
                 });
     }
 
-    private Comment fetchComment(final Long commentId) {
+    private Comment fetchComment(final Long commentId) throws NotFoundException {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> {
                     log.warn("Комментарий с идентификатором {} не найден.", commentId);
