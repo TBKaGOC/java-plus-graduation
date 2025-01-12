@@ -10,7 +10,7 @@ import ru.practicum.comment.dto.GetCommentsAdminRequest;
 import ru.practicum.comment.dto.CommentMapper;
 import ru.practicum.comment.model.Comment;
 import ru.practicum.comment.repository.CommentRepository;
-import ru.practicum.event.enums.State;
+import ru.practicum.event.model.EventState;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.exception.ConflictException;
@@ -38,7 +38,7 @@ public class CommentServiceImpl implements CommentService {
 
         User user = fetchUser(userId);
         Event event = fetchEvent(eventId);
-        if (!State.PUBLISHED.equals(event.getState())) {
+        if (!EventState.PUBLISHED.equals(event.getState())) {
             log.warn("Невозможно добавить комментарий к событию, которое не опубликовано, состояние события = {}",
                     event.getState());
             throw new ConflictException("Невозможно сохранить комментарии для неопубликованного события.");
