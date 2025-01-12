@@ -10,6 +10,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
+
 @Getter
 @Setter
 @ToString
@@ -23,6 +25,6 @@ public class CommentDto {
     @Size(min = 1, max = 5000)
     @NotBlank
     private String content;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     private LocalDateTime created;
 }
