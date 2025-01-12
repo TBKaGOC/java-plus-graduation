@@ -21,7 +21,6 @@ import ru.practicum.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
 @Slf4j
