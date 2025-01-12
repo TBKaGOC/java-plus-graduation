@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.service.CategoryService;
+import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class PublicCategoryController {
     }
 
     @GetMapping("/{catId}")
-    public CategoryDto getCategoryById(@PathVariable Long catId) {
+    public CategoryDto getCategoryById(@PathVariable Long catId) throws NotFoundException {
         return categoryService.getCategoryById(catId);
     }
 }

@@ -41,8 +41,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.initiator.id IN :users " +
             "AND e.state in :states " +
             "AND e.category.id in :categories " +
-            "AND e.eventDate between :rangeStart AND :rangeEnd " +
-            "ORDER BY e.eventDate DESC")
+            "AND e.eventDate between :rangeStart AND :rangeEnd ")
     List<Event> findAllEventsWithDates(List<Long> users,
                                        List<EventState> states,
                                        List<Long> categories,
@@ -52,15 +51,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.category.id in :categories " +
-            "AND e.state = :state " +
-            "ORDER BY e.eventDate DESC")
+            "AND e.state = :state")
     List<Event> findAllByCategoryIdPageable(List<Long> categories, EventState state, Pageable page);
 
     @Query("SELECT e FROM Event e " +
             "WHERE (lower(e.annotation) LIKE :text " +
             "OR lower(e.description) LIKE :text) " +
-            "AND e.state = :state " +
-            "ORDER BY e.eventDate DESC")
+            "AND e.state = :state")
     List<Event> findEventsByText(String text, EventState state, Pageable page);
 
     @Query("SELECT e FROM Event e " +
@@ -68,8 +65,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "OR lower(e.description) LIKE :text) " +
             "AND e.eventDate >= :startDate " +
             "AND e.eventDate <= :endDate " +
-            "AND e.state = :state " +
-            "ORDER BY e.eventDate DESC")
+            "AND e.state = :state")
     List<Event> findAllByTextAndDateRange(String text, LocalDateTime startDate, LocalDateTime endDate, EventState state, Pageable page);
 
     @Query("SELECT DISTINCT e FROM Event e " +

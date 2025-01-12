@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto addUser(UserDto newUserDto) {
+    public UserDto addUser(UserDto newUserDto) throws ConflictException {
         if (userRepository.existsByName(newUserDto.getName())) {
             throw new ConflictException(String.format("Пользователь %s уже существует", newUserDto.getName()));
         }
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public UserDto getUserById(Long userId) throws NotFoundException {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
         return UserMapper.mapUser(user);

@@ -1,6 +1,8 @@
 package ru.practicum.event.model;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public enum EventState {
     PENDING,
@@ -8,6 +10,6 @@ public enum EventState {
     CANCELED;
 
     public static List<String> getAll() {
-        return List.of(PENDING.name(), PUBLISHED.name(), CANCELED.name());
+        return Arrays.stream(values()).map(EventState::name).collect(Collectors.toList());
     }
 }

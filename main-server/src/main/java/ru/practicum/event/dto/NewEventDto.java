@@ -29,7 +29,6 @@ public class NewEventDto {
     @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     String eventDate;
     Location location;
-    String state;
     Boolean paid;
     @PositiveOrZero
     Integer participantLimit;

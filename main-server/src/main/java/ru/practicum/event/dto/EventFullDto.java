@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.category.dto.CategoryDto;
+import ru.practicum.event.model.EventState;
 import ru.practicum.event.model.Location;
 import ru.practicum.user.dto.UserDto;
 
@@ -26,7 +27,7 @@ public class EventFullDto {
     @Size(min = 1, max = 1024)
     String description;
     Integer participantLimit;
-    String state;
+    EventState state;
     String createdOn;
     Location location;
     Boolean requestModeration;

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
@@ -45,7 +46,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     final StatsClient statsClient;
 
     @Override
-    public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
+    public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) throws ValidationException {
 
         List<EventFullDto> eventDtos = null;
         List<EventState> eventStateList = null;
@@ -74,7 +75,8 @@ public class AdminEventServiceImpl implements AdminEventService {
                     .toList();
         } else {
             List<Event> allEventsWithDates = eventRepository.findAllEventsWithDates(users,
-                    eventStateList, categories, rangeStart, rangeEnd, PageRequest.of(from / size, size));
+                    eventStateList, categories, rangeStart, rangeEnd,
+                    PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "e.eventDate")));
 
             List<EventRequest> requestsByEventIds = requestRepository.findByEventIds(allEventsWithDates.stream()
                     .mapToLong(Event::getId).boxed().collect(Collectors.toList()));
@@ -119,7 +121,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
     @Override
-    public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest) {
+    public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest) throws ConflictException, ValidationException, NotFoundException, WrongDataException {
         log.info("Редактирование данных события и его статуса");
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие не существует " + eventId));
@@ -149,12 +151,12 @@ public class AdminEventServiceImpl implements AdminEventService {
         return EventMapper.mapEventToFullDto(event, confirmed);
     }
 
-    Event getEventById(Long eventId) {
+    Event getEventById(Long eventId) throws NotFoundException {
         return eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие " + eventId + " не найдено"));
     }
 
-    void updateEventWithAdminRequest(Event event, UpdateEventAdminRequest updateRequest) {
+    void updateEventWithAdminRequest(Event event, UpdateEventAdminRequest updateRequest) throws NotFoundException, WrongDataException {
         if (updateRequest.getAnnotation() != null) {
             event.setAnnotation(updateRequest.getAnnotation());
         }

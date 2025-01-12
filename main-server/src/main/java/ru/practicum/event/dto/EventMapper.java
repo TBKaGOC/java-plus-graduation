@@ -16,9 +16,6 @@ import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 public class EventMapper {
 
     public static EventFullDto mapEventToFullDto(Event event, Long confirmed) {
-        if (event.getState() == null) {
-            event.setState(EventState.PENDING);
-        }
         EventFullDto eventFullDto = new EventFullDto();
         eventFullDto.setId(event.getId());
         eventFullDto.setAnnotation(event.getAnnotation());
@@ -26,14 +23,14 @@ public class EventMapper {
         eventFullDto.setConfirmedRequests(confirmed);
         eventFullDto.setCreatedOn(getLocalDateTime(event.getCreatedOn()));
         eventFullDto.setDescription(event.getDescription());
-        eventFullDto.setEventDate(event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        eventFullDto.setEventDate(getLocalDateTime(event.getEventDate()));
         eventFullDto.setInitiator(UserMapper.mapUser(event.getInitiator()));
         eventFullDto.setLocation(event.getLocation());
         eventFullDto.setPaid(event.getPaid());
         eventFullDto.setParticipantLimit(event.getParticipantLimit());
         eventFullDto.setPublishedOn(getLocalDateTime(event.getPublishedOn()));
         eventFullDto.setRequestModeration(event.getRequestModeration());
-        eventFullDto.setState(event.getState().toString());
+        eventFullDto.setState(event.getState() == null ? EventState.PENDING : event.getState());
         eventFullDto.setTitle(event.getTitle());
         return eventFullDto;
     }
@@ -55,8 +52,7 @@ public class EventMapper {
         event.setAnnotation(newEvent.getAnnotation());
         event.setCategory(category);
         event.setDescription(newEvent.getDescription());
-        event.setEventDate(LocalDateTime.parse(newEvent.getEventDate(),
-                DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME)));
+        event.setEventDate(getFromString(newEvent.getEventDate()));
         event.setLocation(newEvent.getLocation());
         event.setPaid(newEvent.getPaid());
         event.setParticipantLimit(newEvent.getParticipantLimit());
@@ -70,5 +66,12 @@ public class EventMapper {
             return null;
         }
         return time.format(DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
+    }
+
+    static LocalDateTime getFromString(String time) {
+        if (time == null) {
+            return null;
+        }
+        return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
     }
 }
