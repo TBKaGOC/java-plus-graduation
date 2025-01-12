@@ -11,8 +11,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetCommentsAdminRequest {
-    private Long eventId;
-    private Integer from;
-    private Integer size;
+    Long eventId;
+    Integer from;
+    Integer size;
 }
