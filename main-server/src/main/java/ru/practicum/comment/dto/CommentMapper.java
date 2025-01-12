@@ -7,13 +7,11 @@ import ru.practicum.event.model.Event;
 import ru.practicum.user.model.User;
 
 import java.util.List;
-import java.util.Objects;
 
 @UtilityClass
 public class CommentMapper {
 
     public CommentDto mapToCommentDto(final Comment comment) {
-        Objects.requireNonNull(comment);
         return new CommentDto()
                 .setId(comment.getId())
                 .setUserId(comment.getUser().getId())
@@ -33,12 +31,10 @@ public class CommentMapper {
     }
 
     public Comment mapTo(final CommentDto comment, final User user, final Event event) {
-        Objects.requireNonNull(comment);
         return new Comment()
                 .setId(comment.getId())
                 .setUser(user)
                 .setEvent(event)
                 .setContent(comment.getContent());
     }
-
 }
