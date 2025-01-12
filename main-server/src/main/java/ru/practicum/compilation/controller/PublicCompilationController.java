@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilation.dto.ResponseCompilationDto;
 import ru.practicum.compilation.service.CompilationService;
+import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class PublicCompilationController {
     }
 
     @GetMapping("/{compId}")
-    public ResponseCompilationDto getCompilationById(@PathVariable Long compId) {
+    public ResponseCompilationDto getCompilationById(@PathVariable Long compId) throws NotFoundException {
         return compilationService.getCompilationById(compId);
     }
 

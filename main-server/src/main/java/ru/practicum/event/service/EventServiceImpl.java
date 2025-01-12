@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
     final StatsClient statsClient;
 
     @Override
-    public EventFullDto getEventById(Long eventId, String uri, String ip) {
+    public EventFullDto getEventById(Long eventId, String uri, String ip) throws NotFoundException {
         statsClient.postStats(new StatsRequestDto("main-server",
                 uri,
                 ip,
@@ -70,7 +70,7 @@ public class EventServiceImpl implements EventService {
                                                  Integer from,
                                                  Integer size,
                                                  String uri,
-                                                 String ip) {
+                                                 String ip) throws ValidationException {
         List<Event> events;
         LocalDateTime startDate;
         LocalDateTime endDate;

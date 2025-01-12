@@ -39,7 +39,7 @@ public class EventRequestServiceImpl implements EventRequestService {
 
     @Override
     @Transactional
-    public EventRequestDto addRequest(Long userId, Long eventId) {
+    public EventRequestDto addRequest(Long userId, Long eventId) throws ConflictException, NotFoundException {
         User user = userRepository.getUserById(userId);
         Event event = getEventById(eventId);
 
@@ -64,7 +64,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     }
 
     @Override
-    public List<EventRequestDto> getUserRequests(Long userId) {
+    public List<EventRequestDto> getUserRequests(Long userId) throws NotFoundException {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь не найден userId=" + userId);
         }
@@ -74,7 +74,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     }
 
     @Override
-    public List<EventRequestDto> getRequestsByEventId(Long userId, Long eventId) {
+    public List<EventRequestDto> getRequestsByEventId(Long userId, Long eventId) throws ValidationException, NotFoundException {
         List<EventRequest> requests = getEventRequests(userId, eventId);
         return requests.stream()
                 .map(eventRequestMapper::mapRequest)
@@ -85,7 +85,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     @Transactional
     public EventRequestDto updateRequest(Long userId,
                                          Long eventId,
-                                         EventRequestDto updateRequest) {
+                                         EventRequestDto updateRequest) throws ConflictException, ValidationException, NotFoundException {
         Event event = getEventById(eventId);
         List<EventRequest> requests = getEventRequestsByEventId(eventId);
         long confirmedRequestsCounter = requests.stream().filter(r -> r.getStatus().equals(CONFIRMED_REQUEST)).count();
@@ -143,7 +143,7 @@ public class EventRequestServiceImpl implements EventRequestService {
 
     @Override
     @Transactional
-    public EventRequestDto cancelRequest(Long userId, Long requestId) {
+    public EventRequestDto cancelRequest(Long userId, Long requestId) throws NotFoundException, ValidationException {
 
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь не найден userId=" + userId);
@@ -175,7 +175,7 @@ public class EventRequestServiceImpl implements EventRequestService {
         return newRequest;
     }
 
-    private boolean participationLimitIsFull(Event event) {
+    private boolean participationLimitIsFull(Event event) throws ConflictException {
         Long confirmedRequestsCounter = requestRepository.countByEventAndStatuses(event.getId(), List.of("CONFIRMED", "ACCEPTED"));
         if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= confirmedRequestsCounter) {
             throw new ConflictException("Превышено число заявок на участие");
@@ -183,7 +183,7 @@ public class EventRequestServiceImpl implements EventRequestService {
         return false;
     }
 
-    private List<EventRequest> getEventRequests(Long userId, Long eventId) {
+    private List<EventRequest> getEventRequests(Long userId, Long eventId) throws ValidationException, NotFoundException {
         User user = userRepository.getUserById(userId);
         Event event = getEventById(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
@@ -192,7 +192,7 @@ public class EventRequestServiceImpl implements EventRequestService {
         return requestRepository.findByEventInitiatorId(userId);
     }
 
-    private List<EventRequest> getEventRequestsByEventId(Long eventId) {
+    private List<EventRequest> getEventRequestsByEventId(Long eventId) throws NotFoundException {
         if (eventRepository.existsById(eventId)) {
             return requestRepository.findByEventId(eventId);
         } else {
@@ -200,7 +200,7 @@ public class EventRequestServiceImpl implements EventRequestService {
         }
     }
 
-    private Event getEventById(Long eventId) {
+    private Event getEventById(Long eventId) throws NotFoundException {
         return eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие не найдено eventId=" + eventId));
     }

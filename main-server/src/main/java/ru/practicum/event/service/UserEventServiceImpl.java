@@ -45,7 +45,7 @@ public class UserEventServiceImpl implements UserEventService {
 
     final StatsClient statsClient;
 
-    private static void validationEventDate(Event event) {
+    private static void validationEventDate(Event event) throws ValidationException, WrongDataException {
         if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(1))) {
             throw new ValidationException("До начала события меньше часа, изменение невозможно");
         }
@@ -54,14 +54,14 @@ public class UserEventServiceImpl implements UserEventService {
         }
     }
 
-    private static void validationEventInitiator(User user, Event event) {
+    private static void validationEventInitiator(User user, Event event) throws ValidationException {
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new ValidationException("Пользователь " + user.getId() + " не инициатор события " + event.getId());
         }
     }
 
     @Override
-    public EventFullDto addEvent(Long userId, NewEventDto eventDto) {
+    public EventFullDto addEvent(Long userId, NewEventDto eventDto) throws ValidationException, WrongDataException, NotFoundException {
         log.info("Users...");
         log.info("Добавление нового события пользователем {}", userId);
         User user = getUserById(userId);
@@ -96,7 +96,7 @@ public class UserEventServiceImpl implements UserEventService {
     }
 
     @Override
-    public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest eventDto) {
+    public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest eventDto) throws ConflictException, NotFoundException, ValidationException, WrongDataException {
         log.info("Users...");
         log.info("Редактирование данных события и его статуса");
         Event event = getEventById(eventId);
@@ -116,13 +116,13 @@ public class UserEventServiceImpl implements UserEventService {
         return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed));
     }
 
-    private User getUserById(Long userId) {
+    private User getUserById(Long userId) throws NotFoundException {
         return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Пользователь с id " + userId + " не найден"));
     }
 
     @Override
-    public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer count) {
+    public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer count) throws NotFoundException {
         User user = getUserById(userId);
         return eventRepository.findAllByInitiator(user, PageRequest.of(from / count, count)).stream()
                 .map(EventMapper::mapEventToShortDto)
@@ -130,7 +130,7 @@ public class UserEventServiceImpl implements UserEventService {
     }
 
     @Override
-    public EventFullDto getEventById(Long userId, Long eventId) {
+    public EventFullDto getEventById(Long userId, Long eventId) throws NotFoundException, ValidationException {
         User user = getUserById(userId);
         Event event = getEventById(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
@@ -142,12 +142,12 @@ public class UserEventServiceImpl implements UserEventService {
 
     // Вспомогательные функции
 
-    Event getEventById(Long eventId) {
+    Event getEventById(Long eventId) throws NotFoundException {
         return eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие " + eventId + " не найдено"));
     }
 
-    void updateEventFromEventDto(Event event, UpdateEventUserRequest inpEventDto) {
+    void updateEventFromEventDto(Event event, UpdateEventUserRequest inpEventDto) throws NotFoundException, ValidationException {
         if (inpEventDto.getAnnotation() != null) {
             event.setAnnotation(inpEventDto.getAnnotation());
         }

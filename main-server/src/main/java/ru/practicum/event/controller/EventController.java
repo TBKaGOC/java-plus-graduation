@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.service.EventService;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class EventController {
 
     @GetMapping("/{id}")
     public EventFullDto getEventById(@PathVariable Long id,
-                                     HttpServletRequest request) {
+                                     HttpServletRequest request) throws NotFoundException {
         return eventService.getEventById(id, request.getRequestURI(), request.getRemoteAddr());
     }
 
@@ -37,7 +39,7 @@ public class EventController {
                                                  @RequestParam(required = false, defaultValue = "EVENT_DATE") String sort,
                                                  @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                  @Positive @RequestParam(defaultValue = "10") Integer count,
-                                                 HttpServletRequest request) {
+                                                 HttpServletRequest request) throws ValidationException {
         return eventService.getFilteredEvents(text, categories, paid, rangeStart, rangeEnd, available, sort, from, count,
                 request.getRequestURI(), request.getRemoteAddr());
     }

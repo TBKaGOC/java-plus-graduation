@@ -10,6 +10,8 @@ import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.compilation.dto.ResponseCompilationDto;
 import ru.practicum.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.compilation.service.CompilationService;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
 
 @RestController
 @RequestMapping("/admin/compilations")
@@ -27,13 +29,13 @@ public class AdminCompilationController {
 
     @PatchMapping("/{compId}")
     public ResponseCompilationDto update(@PathVariable Long compId,
-                                         @Valid @RequestBody UpdateCompilationRequest compilationDto) {
+                                         @Valid @RequestBody UpdateCompilationRequest compilationDto) throws NotFoundException {
         return compilationService.updateCompilation(compId, compilationDto);
     }
 
     @DeleteMapping("/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long compId) {
+    public void delete(@PathVariable Long compId) throws ValidationException, NotFoundException {
         compilationService.deleteCompilation(compId);
     }
 }

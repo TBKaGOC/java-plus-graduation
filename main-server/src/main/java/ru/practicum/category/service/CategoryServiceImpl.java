@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto addCategory(CategoryDto categoryDto) {
+    public CategoryDto addCategory(CategoryDto categoryDto) throws ConflictException {
         if (categoryRepository.existsByName(categoryDto.getName())) {
             throw new ConflictException("Такая категория событий уже существует");
         }
@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
+    public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) throws NotFoundException, ConflictException {
         // Найти категорию по ID, либо выбросить исключение, если не найдена
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Категория с ID " + catId + " не найдена."));
@@ -64,7 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryDto getCategoryById(Long catId) {
+    public CategoryDto getCategoryById(Long catId) throws NotFoundException {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Указанная категория не найдена " + catId));
 
@@ -82,7 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void deleteCategory(Long catId) {
+    public void deleteCategory(Long catId) throws ConflictException, NotFoundException {
         if (!categoryRepository.existsById(catId)) {
             throw new NotFoundException(String.format("Категория с id=%d не существует", catId));
         }
