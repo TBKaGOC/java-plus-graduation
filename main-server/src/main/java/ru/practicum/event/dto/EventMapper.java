@@ -30,11 +30,7 @@ public class EventMapper {
         eventFullDto.setParticipantLimit(event.getParticipantLimit());
         eventFullDto.setPublishedOn(getLocalDateTime(event.getPublishedOn()));
         eventFullDto.setRequestModeration(event.getRequestModeration());
-        if (event.getState() == null) {
-            eventFullDto.setState(EventState.PENDING.toString());
-        } else {
-            eventFullDto.setState(event.getState().toString());
-        }
+        eventFullDto.setState(event.getState() == null ? EventState.PENDING : event.getState());
         eventFullDto.setTitle(event.getTitle());
         return eventFullDto;
     }
