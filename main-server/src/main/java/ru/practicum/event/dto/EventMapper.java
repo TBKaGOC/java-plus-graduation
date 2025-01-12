@@ -16,9 +16,6 @@ import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 public class EventMapper {
 
     public static EventFullDto mapEventToFullDto(Event event, Long confirmed) {
-        if (event.getState() == null) {
-            event.setState(EventState.PENDING);
-        }
         EventFullDto eventFullDto = new EventFullDto();
         eventFullDto.setId(event.getId());
         eventFullDto.setAnnotation(event.getAnnotation());
@@ -33,7 +30,11 @@ public class EventMapper {
         eventFullDto.setParticipantLimit(event.getParticipantLimit());
         eventFullDto.setPublishedOn(getLocalDateTime(event.getPublishedOn()));
         eventFullDto.setRequestModeration(event.getRequestModeration());
-        eventFullDto.setState(event.getState().toString());
+        if (event.getState() == null) {
+            eventFullDto.setState(EventState.PENDING.toString());
+        } else {
+            eventFullDto.setState(event.getState().toString());
+        }
         eventFullDto.setTitle(event.getTitle());
         return eventFullDto;
     }
