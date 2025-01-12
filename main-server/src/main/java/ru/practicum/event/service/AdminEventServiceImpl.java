@@ -75,7 +75,8 @@ public class AdminEventServiceImpl implements AdminEventService {
                     .toList();
         } else {
             List<Event> allEventsWithDates = eventRepository.findAllEventsWithDates(users,
-                    eventStateList, categories, rangeStart, rangeEnd, PageRequest.of(from / size, size, Sort.Direction.DESC));
+                    eventStateList, categories, rangeStart, rangeEnd,
+                    PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "e.eventDate")));
 
             List<EventRequest> requestsByEventIds = requestRepository.findByEventIds(allEventsWithDates.stream()
                     .mapToLong(Event::getId).boxed().collect(Collectors.toList()));

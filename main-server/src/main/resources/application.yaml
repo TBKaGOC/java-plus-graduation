@@ -22,12 +22,13 @@ spring:
     log-startup-info: false
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://main-db:5432/explore-main
+    url: jdbc:postgresql://localhost:6432/explore-main
     username: explore-main
     password: explore-main
 logging:
   level:
     org:
+      zalando.logbook: TRACE
       springframework:
         orm:
           jpa: INFO

@@ -78,7 +78,9 @@ public class EventServiceImpl implements EventService {
         boolean sortDate = sort.equals("EVENT_DATE");
         if (sortDate) {
             if (rangeStart == null && rangeEnd == null && categories != null) {
-                events = eventRepository.findAllByCategoryIdPageable(categories, EventState.PUBLISHED, PageRequest.of(from / size, size, Sort.Direction.DESC));
+                //events = eventRepository.findAllByCategoryIdPageable(categories, EventState.PUBLISHED, PageRequest.of(from / size, size, Sort.Direction.DESC));
+                events = eventRepository.findAllByCategoryIdPageable(categories, EventState.PUBLISHED,
+                        PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "e.eventDate")));
             } else {
                 if (rangeStart == null) {
                     startDate = LocalDateTime.now();
@@ -89,7 +91,8 @@ public class EventServiceImpl implements EventService {
                     text = "";
                 }
                 if (rangeEnd == null) {
-                    events = eventRepository.findEventsByText("%" + text.toLowerCase() + "%", EventState.PUBLISHED, PageRequest.of(from / size, size, Sort.Direction.DESC));
+                    events = eventRepository.findEventsByText("%" + text.toLowerCase() + "%", EventState.PUBLISHED,
+                            PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "e.eventDate")));
                 } else {
                     endDate = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
                     if (startDate.isAfter(endDate)) {
@@ -99,7 +102,7 @@ public class EventServiceImpl implements EventService {
                                 startDate,
                                 endDate,
                                 EventState.PUBLISHED,
-                                PageRequest.of(from / size, size, Sort.Direction.DESC));
+                                PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "e.eventDate")));
                     }
                 }
             }
