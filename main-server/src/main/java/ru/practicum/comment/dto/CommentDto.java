@@ -16,15 +16,16 @@ import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 @Setter
 @ToString
 @Accessors(chain = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentDto {
-    private Long id;
-    private Long userId;
-    private Long eventId;
+    Long id;
+    Long userId;
+    Long eventId;
     @JsonProperty("isInitiator")
-    private boolean isInitiator;
+    boolean isInitiator;
     @Size(min = 1, max = 5000)
     @NotBlank
-    private String content;
+    String content;
     @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
-    private LocalDateTime created;
+    LocalDateTime created;
 }
