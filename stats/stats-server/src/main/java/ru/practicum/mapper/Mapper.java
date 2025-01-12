@@ -1,10 +1,9 @@
 package ru.practicum.mapper;
 
-import ru.practicum.model.Requests;
-import ru.practicum.model.Response;
-
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
+import ru.practicum.model.Requests;
+import ru.practicum.model.Response;
 
 public class Mapper {
     public static StatsRequestDto toRequestDto(Requests request) {
