@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.event.model.Event;
 import ru.practicum.user.model.User;
@@ -20,7 +19,7 @@ import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 @AllArgsConstructor
 @Table(name = "comment")
 @EqualsAndHashCode(of = "id")
-@Accessors(chain = true)
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
 
