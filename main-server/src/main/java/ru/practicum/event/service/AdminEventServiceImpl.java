@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
@@ -74,7 +75,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                     .toList();
         } else {
             List<Event> allEventsWithDates = eventRepository.findAllEventsWithDates(users,
-                    eventStateList, categories, rangeStart, rangeEnd, PageRequest.of(from / size, size));
+                    eventStateList, categories, rangeStart, rangeEnd, PageRequest.of(from / size, size, Sort.Direction.DESC));
 
             List<EventRequest> requestsByEventIds = requestRepository.findByEventIds(allEventsWithDates.stream()
                     .mapToLong(Event::getId).boxed().collect(Collectors.toList()));

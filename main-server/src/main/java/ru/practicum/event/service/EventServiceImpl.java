@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.client.StatsClient;
 import ru.practicum.dto.StatsRequestDto;
@@ -77,7 +78,7 @@ public class EventServiceImpl implements EventService {
         boolean sortDate = sort.equals("EVENT_DATE");
         if (sortDate) {
             if (rangeStart == null && rangeEnd == null && categories != null) {
-                events = eventRepository.findAllByCategoryIdPageable(categories, EventState.PUBLISHED, PageRequest.of(from / size, size));
+                events = eventRepository.findAllByCategoryIdPageable(categories, EventState.PUBLISHED, PageRequest.of(from / size, size, Sort.Direction.DESC));
             } else {
                 if (rangeStart == null) {
                     startDate = LocalDateTime.now();
@@ -88,7 +89,7 @@ public class EventServiceImpl implements EventService {
                     text = "";
                 }
                 if (rangeEnd == null) {
-                    events = eventRepository.findEventsByText("%" + text.toLowerCase() + "%", EventState.PUBLISHED, PageRequest.of(from / size, size));
+                    events = eventRepository.findEventsByText("%" + text.toLowerCase() + "%", EventState.PUBLISHED, PageRequest.of(from / size, size, Sort.Direction.DESC));
                 } else {
                     endDate = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
                     if (startDate.isAfter(endDate)) {
@@ -98,7 +99,7 @@ public class EventServiceImpl implements EventService {
                                 startDate,
                                 endDate,
                                 EventState.PUBLISHED,
-                                PageRequest.of(from / size, size));
+                                PageRequest.of(from / size, size, Sort.Direction.DESC));
                     }
                 }
             }
