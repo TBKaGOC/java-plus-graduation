@@ -779,7 +779,7 @@
 									"\r",
 									"const response = pm.response.json();\r",
 									"pm.test(\"Response should contain error message\", function () {\r",
-									"    pm.expect(response.message).to.equal(\"Невозможно сохранить комментарии для неопубликованного события.\");\r",
+									"    pm.expect(response.error).to.equal(\"Невозможно сохранить комментарии для неопубликованного события.\");\r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -977,7 +977,7 @@
 									"\r",
 									"const response = pm.response.json();\r",
 									"pm.test(\"Response should contain error message\", function () {\r",
-									"    pm.expect(response.message).to.equal(\"Пользователь может удалять только свои комментарии.\");\r",
+									"    pm.expect(response.error).to.equal(\"Пользователь может удалять только свои комментарии.\");\r",
 									"});"
 								],
 								"type": "text/javascript",
