@@ -31,6 +31,7 @@ public class CommentServiceImpl implements CommentService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public CommentDto addComment(final CommentDto commentDto, Long userId, Long eventId) throws NotFoundException, ConflictException {
         commentDto.setUserId(userId);
         commentDto.setEventId(eventId);
@@ -53,6 +54,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void delete(final Long userId, final Long commentId) throws NotFoundException, ConflictException {
         Comment comment = fetchComment(commentId);
 
@@ -63,12 +65,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void delete(final Long commentId) throws NotFoundException {
         Comment comment = fetchComment(commentId);
         commentRepository.delete(comment);
     }
 
     @Override
+    @Transactional
     public CommentDto updateUserComment(final Long userId, final Long commentId,
                                         final CommentDto commentDto) throws NotFoundException, ConflictException {
         Comment comment = fetchComment(commentId);
@@ -84,14 +88,12 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.mapToCommentDto(updated);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<CommentDto> getAllUserComments(final Long userId) throws NotFoundException {
         User user = fetchUser(userId);
         return CommentMapper.mapToCommentDto(commentRepository.findByUserId(user.getId()));
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<CommentDto> getAllEventComments(final GetCommentsAdminRequest param) throws NotFoundException {
         final List<Comment> comments =
@@ -99,7 +101,6 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.mapToCommentDto(comments);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<CommentDto> getAllEventComments(final Long eventId, final int from, final int size) throws NotFoundException {
         return CommentMapper.mapToCommentDto(getEventComments(eventId, from, size));
