@@ -17,6 +17,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<modules>
+		<module>stats</module>
+		<module>core</module>
+		<module>infra</module>
+		<module>infra/gateway-server</module>
+	</modules>
+
 	<properties>
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -56,7 +63,7 @@
 						<dependency>
 							<groupId>com.puppycrawl.tools</groupId>
 							<artifactId>checkstyle</artifactId>
-							<version>10.3</version>
+							<version>10.18.1</version>
 						</dependency>
 					</dependencies>
 				</plugin>
