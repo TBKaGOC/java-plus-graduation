@@ -1,23 +1,19 @@
-server:
-  port: 9090
-  uri: http://stats-server:9090
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-        jdbc.time_zone: UTC
-  sql:
-    init:
-      mode: always
-  main:
-    banner-mode: off
-    log-startup-info: false
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:6432/explore-stats
-    username: explore-stats
-    password: explore-stats
+  application:
+    name: stats-server
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
+eureka:
+  client:
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
