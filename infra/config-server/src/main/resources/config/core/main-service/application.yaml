@@ -1,5 +1,5 @@
 server:
-  port: 8081 #Пришлось установить конкретный, иначе он занимал порт gateway
+  port: 0
   url: http://localhost:{server.port}
 stats-server:
   url: "http://stats-server"
