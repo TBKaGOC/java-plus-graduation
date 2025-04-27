@@ -1,6 +1,7 @@
 spring:
   cloud:
     gateway:
+      actuator.verbose.enabled: false
       discovery.locator.enabled: true
       routes:
         - id: comment_service_route
@@ -32,3 +33,9 @@ spring:
 
 server:
   port: 8080
+management.endpoints:
+  gateway:
+    enabled: false
+  web:
+    exposure:
+      include: gateway
