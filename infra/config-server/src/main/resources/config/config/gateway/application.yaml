@@ -5,29 +5,28 @@ spring:
       routes:
         - id: comment_service_route
           uri: lb://main-server
-
           predicates:
-            - Path=/admin/comments/**, /user/{userId}/comments/**, /events/{eventId}/comments/**
+            - Path=/admin/comments/**,/user/{userId}/comments/**,/events/{eventId}/comments/**
+
         - id: events_service_route
           uri: lb://main-server
-
           predicates:
-            - Path=/admin/events/**, /events/**, /user/{userId}/events/**
+            - Path=/admin/events/**,/events/**,/user/{userId}/events/**
+
         - id: user_service_route
           uri: lb://main-server
-
           predicates:
-            - Path=/admin/users/**, /user/{userId}/**
+            - Path=/admin/users/**,/user/{userId}/**
+
         - id: compilation_service_route
           uri: lb://main-server
-
           predicates:
-            - Path=/admin/compilations/**, /compilations/**
+            - Path=/admin/compilations/**,/compilations/**
+
         - id: comment_service_route
           uri: lb://main-server
-
           predicates:
-            - Path=/admin/categories/**, /user/{userId}/categories/**
+            - Path=/admin/categories/**,/user/{userId}/categories/**
 
 
 server:
