@@ -11,7 +11,7 @@ spring:
           searchLocations:
             - classpath:config/core/{application}
             - classpath:config/stats/{application}
-            - classpath:config/config/{application}
+            - classpath:config/infra/{application}
 eureka:
   client:
     fetchRegistry: true

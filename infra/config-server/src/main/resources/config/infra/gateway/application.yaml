@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    loadbalancer.configurations: health-check
+    gateway:
+      actuator.verbose.enabled: false
+      discovery.locator.enabled: true
+      routes:
+        - id: service_route
+          uri: lb://main-service
+
+
+server:
+  port: 8080
+management.endpoints:
+  gateway:
+    enabled: false
