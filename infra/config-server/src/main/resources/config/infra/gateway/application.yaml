@@ -7,9 +7,11 @@ spring:
         locator:
           enabled: true
           lowerCaseServiceId: true
-      # routes:
-        # - id: service_route
-        #   uri: lb://main-service
+      routes:
+        - id: service_route
+          uri: lb://main-service/
+          predicates:
+            - Path=/**
 
 
 server:
