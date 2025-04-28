@@ -6,10 +6,9 @@ spring:
       discovery:
         locator:
           enabled: true
-          lowerCaseServiceId: true
       routes:
         - id: service_route
-          uri: lb://main-service
+          uri: lb://MAIN-SERVICE
           predicates:
             - Path=/admin/**,/events/**,/users/**,compilations/**
 
