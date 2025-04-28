@@ -1,6 +1,9 @@
 spring:
   cloud:
-    loadbalancer.configurations: health-check
+    loadbalancer:
+      configurations: health-check
+      retry:
+        enabled: true
     gateway:
       actuator.verbose.enabled: false
       discovery:
@@ -10,7 +13,7 @@ spring:
         - id: service_route
           uri: lb://MAIN-SERVICE
           predicates:
-            - Path=/admin/**,/events/**,/users/**,compilations/**
+            - Path=/admin/**,/events/**,/users/**,/compilations/**
 
 
 server:
@@ -23,3 +26,6 @@ management:
   endpoint:
     gateway:
       enabled: true
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
