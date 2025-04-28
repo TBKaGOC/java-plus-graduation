@@ -11,8 +11,7 @@ spring:
         - id: service_route
           uri: lb://main-service
           predicates:
-            - Path=/**
-            - not Path=/actuator/**
+            - Path=/admin/**,/events/**,/users/**,compilations/**
 
 
 server:
