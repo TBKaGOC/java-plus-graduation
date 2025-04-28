@@ -1,5 +1,6 @@
 spring:
   cloud:
+    loadbalancer.configurations: health-check
     gateway:
       actuator.verbose.enabled: false
       discovery.locator.enabled: true
@@ -36,6 +37,3 @@ server:
 management.endpoints:
   gateway:
     enabled: false
-  web:
-    exposure:
-      include: gateway
