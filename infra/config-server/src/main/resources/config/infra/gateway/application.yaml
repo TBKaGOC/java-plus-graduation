@@ -16,4 +16,11 @@ spring:
 
 server:
   port: 8080
-management.endpoints.web.exposure.include: "*"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
