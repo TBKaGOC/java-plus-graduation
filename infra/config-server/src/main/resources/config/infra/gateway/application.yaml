@@ -3,7 +3,10 @@ spring:
     loadbalancer.configurations: health-check
     gateway:
       actuator.verbose.enabled: false
-      discovery.locator.enabled: true
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
       routes:
         - id: service_route
           uri: lb://main-service

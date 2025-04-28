@@ -1,6 +1,5 @@
 server:
   port: 0
-  uri: http://localhost:{server.port}
 stats-server:
   url: "http://stats-server"
 spring:
