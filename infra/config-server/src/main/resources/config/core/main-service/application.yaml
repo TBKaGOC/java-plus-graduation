@@ -35,3 +35,8 @@ logging:
         orm:
           jpa: INFO
         transaction: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
