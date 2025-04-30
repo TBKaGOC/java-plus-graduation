@@ -10,7 +10,7 @@ import ru.practicum.dto.StatsResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
+import static ru.practicum.client.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 
 @RestController
 public interface StatsInterface {
