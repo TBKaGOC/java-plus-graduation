@@ -202,7 +202,7 @@ public class UserEventServiceImpl implements UserEventService {
         LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
         LocalDateTime end = LocalDateTime.now();
 
-        Integer views = statsClient.getAllStats(start, end, urls, true).size();
+        Integer views = statsClient.getStats(start, end, urls, true).size();
         eventFullDto.setViews(views);
         return eventFullDto;
     }

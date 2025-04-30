@@ -39,7 +39,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getEventById(Long eventId, String uri, String ip) throws NotFoundException {
-        statsClient.postStats(new StatsRequestDto("main-server",
+        statsClient.save(new StatsRequestDto("main-server",
                 uri,
                 ip,
                 LocalDateTime.now()));
@@ -55,7 +55,7 @@ public class EventServiceImpl implements EventService {
         List<String> urls = Collections.singletonList(uri);
         LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
         LocalDateTime end = LocalDateTime.now();
-        var views = statsClient.getAllStats(start, end, urls, true).size();
+        var views = statsClient.getStats(start, end, urls, true).size();
         eventFullDto.setViews(views);
         return eventFullDto;
     }
@@ -124,7 +124,7 @@ public class EventServiceImpl implements EventService {
             }
             events = eventRepository.findEventList(text, categories, paid, startDate, endDate, EventState.PUBLISHED);
         }
-        statsClient.postStats(new StatsRequestDto("main-server",
+        statsClient.save(new StatsRequestDto("main-server",
                 uri,
                 ip,
                 LocalDateTime.now()));
@@ -157,7 +157,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        var viewsCounter = statsClient.getAllStats(startTime, LocalDateTime.now(), uris, true);
+        var viewsCounter = statsClient.getStats(startTime, LocalDateTime.now(), uris, true);
         for (var statsDto : viewsCounter) {
             String[] split = statsDto.getUri().split("/");
             eventIdsWithViewsCounter.put(Long.parseLong(split[2]), Math.toIntExact(statsDto.getHits()));

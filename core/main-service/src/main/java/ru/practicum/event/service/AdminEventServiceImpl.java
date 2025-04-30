@@ -100,7 +100,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                 }
             }
 
-            var viewsCounter = statsClient.getAllStats(startTime, LocalDateTime.now(), uris, true);
+            var viewsCounter = statsClient.getStats(startTime, LocalDateTime.now(), uris, true);
             for (var statsDto : viewsCounter) {
                 String[] split = statsDto.getUri().split("/");
                 eventIdsWithViewsCounter.put(Long.parseLong(split[2]), Math.toIntExact(statsDto.getHits()));
@@ -211,7 +211,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
         LocalDateTime end = LocalDateTime.now();
 
-        Integer views = statsClient.getAllStats(start, end, urls, true).size();
+        Integer views = statsClient.getStats(start, end, urls, true).size();
         eventFullDto.setViews(views);
         return eventFullDto;
     }
