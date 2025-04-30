@@ -26,6 +26,3 @@ management:
   endpoint:
     gateway:
       enabled: true
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
