@@ -8,8 +8,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableDiscoveryClient
-@EnableFeignClients
 public class ExploreApplication {
     public static void main(String[] args) {
         SpringApplication.run(ExploreApplication.class, args);

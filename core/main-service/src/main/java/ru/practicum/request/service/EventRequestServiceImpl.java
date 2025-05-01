@@ -15,6 +15,7 @@ import ru.practicum.exception.ValidationException;
 import ru.practicum.request.dto.EventRequestDto;
 import ru.practicum.request.dto.EventRequestMapper;
 import ru.practicum.request.model.EventRequest;
+import ru.practicum.request.model.EventRequestStatus;
 import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
@@ -120,9 +121,9 @@ public class EventRequestServiceImpl implements EventRequestService {
                 request.setStatus(updateRequest.getStatus());
                 EventRequestDto participationRequestDto = eventRequestMapper.mapRequest(request);
 
-                if ("CONFIRMED".equals(participationRequestDto.getStatus())) {
+                if (CONFIRMED_REQUEST.equals(participationRequestDto.getStatus())) {
                     confirmedRequests.add(participationRequestDto);
-                } else if ("REJECTED".equals(participationRequestDto.getStatus())) {
+                } else if (REJECTED_REQUEST.equals(participationRequestDto.getStatus())) {
                     rejectedRequests.add(participationRequestDto);
                 }
 

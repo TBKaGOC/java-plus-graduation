@@ -131,15 +131,7 @@ public class EventServiceImpl implements EventService {
         if (!sortDate) {
             List<EventShortDto> shortEventDtos = createShortEventDtos(events);
             shortEventDtos.sort(Comparator.comparing(EventShortDto::getViews));
-            if (shortEventDtos.size() > from) {
-                if (shortEventDtos.size() > from + size) {
-                    shortEventDtos = shortEventDtos.subList(from, from + size);
-                } else {
-                    shortEventDtos = shortEventDtos.subList(from, shortEventDtos.size());
-                }
-            } else {
-                shortEventDtos = Collections.emptyList();
-            }
+            shortEventDtos = shortEventDtos.subList(from, Math.min(from + size, shortEventDtos.size()));
             return shortEventDtos;
         }
         return createShortEventDtos(events);
