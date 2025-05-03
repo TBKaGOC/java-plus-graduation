@@ -25,7 +25,7 @@ public class Event {
     @Column(nullable = false, length = 1024)
     String annotation;
 
-    @Column(name = "category_id")
+    @Column(name = "category")
     Long categoryId;
 
     @Column(name = "created_on")
@@ -37,7 +37,7 @@ public class Event {
     @Column(nullable = false, name = "event_date")
     LocalDateTime eventDate;
 
-    @Column(name = "initiator_id")
+    @Column
     Long initiator;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
