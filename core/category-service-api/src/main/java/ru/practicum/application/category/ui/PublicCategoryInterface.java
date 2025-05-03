@@ -7,6 +7,7 @@ import ru.practicum.application.api.exception.NotFoundException;
 import java.util.List;
 
 @RequestMapping("/categories")
+@RestController
 public interface PublicCategoryInterface {
     @GetMapping
     List<CategoryDto> getAllCategories(@RequestParam(required = false, defaultValue = "0") Integer from,

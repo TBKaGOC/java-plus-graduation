@@ -12,6 +12,7 @@ import java.util.Collection;
 
 @RequestMapping("/admin/comments")
 @Validated
+@RestController
 public interface AdminCommentInterface {
     @GetMapping
     Collection<CommentDto> getComments(

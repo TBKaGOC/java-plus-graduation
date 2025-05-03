@@ -8,6 +8,7 @@ import ru.practicum.application.api.exception.ConflictException;
 import ru.practicum.application.api.exception.NotFoundException;
 
 @RequestMapping("/admin/categories")
+@RestController
 public interface AdminCategoryInterface {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

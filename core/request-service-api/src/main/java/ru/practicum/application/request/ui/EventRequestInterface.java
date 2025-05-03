@@ -10,6 +10,7 @@ import ru.practicum.application.api.dto.request.EventRequestDto;
 import java.util.List;
 
 @RequestMapping("/users/{userId}")
+@RestController
 public interface EventRequestInterface {
     @PostMapping("/requests")
     @ResponseStatus(HttpStatus.CREATED)

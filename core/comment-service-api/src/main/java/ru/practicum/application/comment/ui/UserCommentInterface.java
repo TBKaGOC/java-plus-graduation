@@ -14,6 +14,7 @@ import java.util.Collection;
 
 @RequestMapping("/users/{userId}/comments")
 @Validated
+@RestController
 public interface UserCommentInterface {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

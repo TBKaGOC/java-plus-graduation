@@ -15,6 +15,7 @@ import ru.practicum.application.api.exception.WrongDataException;
 import java.util.List;
 
 @RequestMapping("/users/{userId}/events")
+@RestController
 public interface UserEventInterface {
     @GetMapping
     List<EventShortDto> getUserEvents(

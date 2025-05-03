@@ -10,6 +10,7 @@ import ru.practicum.application.api.exception.ValidationException;
 import ru.practicum.application.api.request.compilation.UpdateCompilationRequest;
 
 @RequestMapping("/admin/compilations")
+@RestController
 public interface AdminCompilationInterface {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

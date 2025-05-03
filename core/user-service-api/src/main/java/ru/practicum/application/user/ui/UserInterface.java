@@ -9,6 +9,7 @@ import ru.practicum.application.api.exception.ConflictException;
 import java.util.List;
 
 @RequestMapping("/admin/users")
+@RestController
 public interface UserInterface {
     @GetMapping
     List<UserDto> getUsersList(@RequestParam(required = false) List<Long> ids,

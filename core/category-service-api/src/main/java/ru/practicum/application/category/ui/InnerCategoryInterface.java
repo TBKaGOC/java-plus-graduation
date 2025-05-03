@@ -1,15 +1,13 @@
 package ru.practicum.application.category.ui;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.application.api.dto.category.CategoryDto;
 
 import java.util.List;
 import java.util.Set;
 
 @RequestMapping("/inner/category")
+@RestController
 public interface InnerCategoryInterface {
     @GetMapping("/exist/{categoryId}")
     boolean existById(@PathVariable Long categoryId);

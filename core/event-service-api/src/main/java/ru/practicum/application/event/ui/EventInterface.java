@@ -3,10 +3,7 @@ package ru.practicum.application.event.ui;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.application.api.dto.event.EventFullDto;
 import ru.practicum.application.api.dto.event.EventShortDto;
 import ru.practicum.application.api.exception.NotFoundException;
@@ -15,6 +12,7 @@ import ru.practicum.application.api.exception.ValidationException;
 import java.util.List;
 
 @RequestMapping("/events")
+@RestController
 public interface EventInterface {
     @GetMapping("/{id}")
     EventFullDto getEventById(@PathVariable Long id, HttpServletRequest request) throws NotFoundException;

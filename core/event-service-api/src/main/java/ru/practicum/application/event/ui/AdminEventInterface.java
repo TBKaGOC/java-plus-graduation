@@ -16,6 +16,7 @@ import java.util.List;
 import static ru.practicum.application.api.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 
 @RequestMapping("/admin/events")
+@RestController
 public interface AdminEventInterface {
     @GetMapping
     List<EventFullDto> getEvents(
