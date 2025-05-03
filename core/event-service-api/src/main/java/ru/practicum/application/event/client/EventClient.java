@@ -1,8 +1,8 @@
 package ru.practicum.application.event.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import ru.practicum.application.event.ui.EventInterface;
+import ru.practicum.application.event.api.*;
 
 @FeignClient(name = "events-management")
-public interface EventClient extends EventInterface {
+public interface EventClient extends AbstractEventInterface {
 }

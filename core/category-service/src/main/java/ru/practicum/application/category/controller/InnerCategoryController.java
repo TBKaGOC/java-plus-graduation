@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.application.api.dto.category.CategoryDto;
 import ru.practicum.application.category.service.CategoryService;
-import ru.practicum.application.category.ui.InnerCategoryInterface;
+import ru.practicum.application.category.api.InnerCategoryInterface;
 
 import java.util.List;
 import java.util.Set;

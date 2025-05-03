@@ -18,15 +18,16 @@ import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.exception.ValidationException;
 import ru.practicum.application.api.exception.WrongDataException;
 import ru.practicum.application.api.request.event.UpdateEventUserRequest;
+import ru.practicum.application.category.client.CategoryClient;
+import ru.practicum.application.event.client.EventClient;
 import ru.practicum.application.event.repository.EventRepository;
 import ru.practicum.application.event.repository.LocationRepository;
-import ru.practicum.application.category.client.InnerCategoryClient;
-import ru.practicum.application.category.client.PublicCategoryClient;
+import ru.practicum.application.request.client.EventRequestClient;
+import ru.practicum.application.user.client.UserClient;
 import ru.practicum.client.StatsClient;
 import ru.practicum.application.event.mapper.EventMapper;
 import ru.practicum.application.event.model.Event;
-import ru.practicum.application.request.ui.InnerEventRequestInterface;
-import ru.practicum.application.user.client.InnerUserClient;
+import ru.practicum.application.request.api.InnerEventRequestInterface;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,10 +46,10 @@ public class UserEventServiceImpl implements UserEventService {
     final EventRepository eventRepository;
     final LocationRepository locationRepository;
 
-    final InnerUserClient innerUserClient;
-    final PublicCategoryClient categoryClient;
-    final InnerCategoryClient innerCategoryClient;
-    final InnerEventRequestInterface innerRequestClient;
+    final UserClient userClient;
+    final CategoryClient categoryClient;
+    final EventClient eventClient;
+    final EventRequestClient requestClient;
 
     final StatsClient statsClient;
 
@@ -82,7 +83,7 @@ public class UserEventServiceImpl implements UserEventService {
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
 
-        Long confirmedRequests = innerRequestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
+        Long confirmedRequests = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
 
         if (event.getPaid() == null) {
             event.setPaid(false);
@@ -117,20 +118,20 @@ public class UserEventServiceImpl implements UserEventService {
         updateEventFromEventDto(event, eventDto);
         locationRepository.save(event.getLocation());
         eventRepository.save(event);
-        Long confirmed = innerRequestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
+        Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
         return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed,
                 categoryClient.getCategoryById(event.getCategoryId()), user));
     }
 
     private UserDto getUserById(Long userId) throws NotFoundException {
-        return innerUserClient.getById(userId);
+        return userClient.getById(userId);
     }
 
     @Override
     public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer count) throws NotFoundException {
         UserDto user = getUserById(userId);
         List<Event> allEvents = eventRepository.findAllByInitiator(user.getId(), PageRequest.of(from / count, count));
-        Map<Long, CategoryDto> categories = innerCategoryClient.getCategoriesByIds(
+        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
                 allEvents.stream().map(Event::getCategoryId).collect(Collectors.toSet())
         ).stream().collect(Collectors.toMap(CategoryDto::getId, c -> c));
         return allEvents.stream()
@@ -145,7 +146,7 @@ public class UserEventServiceImpl implements UserEventService {
         if (!user.getId().equals(event.getInitiator())) {
             throw new ValidationException("Пользователь " + userId + " не является инициатором события " + eventId);
         }
-        Long confirmed = innerRequestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
+        Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
         return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed,
                 categoryClient.getCategoryById(event.getCategoryId()), user));
     }
@@ -162,7 +163,7 @@ public class UserEventServiceImpl implements UserEventService {
             event.setAnnotation(inpEventDto.getAnnotation());
         }
         if (inpEventDto.getCategory() != null) {
-            if (!innerCategoryClient.existById(inpEventDto.getCategory())) {
+            if (!categoryClient.existById(inpEventDto.getCategory())) {
                 throw new NotFoundException("Категория не найдена " + inpEventDto.getCategory());
             }
             event.setCategoryId(inpEventDto.getCategory());

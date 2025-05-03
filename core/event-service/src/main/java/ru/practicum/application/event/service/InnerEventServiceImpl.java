@@ -9,8 +9,8 @@ import ru.practicum.application.api.dto.category.CategoryDto;
 import ru.practicum.application.api.dto.event.EventFullDto;
 import ru.practicum.application.api.dto.event.EventShortDto;
 import ru.practicum.application.api.dto.user.UserDto;
+import ru.practicum.application.category.client.CategoryClient;
 import ru.practicum.application.event.repository.EventRepository;
-import ru.practicum.application.category.client.InnerCategoryClient;
 import ru.practicum.application.event.mapper.EventMapper;
 import ru.practicum.application.event.model.Event;
 import ru.practicum.application.user.client.UserClient;
@@ -26,7 +26,7 @@ public class InnerEventServiceImpl implements InnerEventService {
     final EventRepository eventRepository;
 
     final UserClient userClient;
-    final InnerCategoryClient categoryClient;
+    final CategoryClient categoryClient;
 
     @Override
     public EventFullDto getEventById(Long eventId) {

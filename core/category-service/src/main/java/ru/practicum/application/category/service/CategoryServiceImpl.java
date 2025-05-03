@@ -13,7 +13,7 @@ import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.category.repository.CategoryRepository;
 import ru.practicum.application.category.mapper.CategoryMapper;
 import ru.practicum.application.category.model.Category;
-import ru.practicum.application.event.client.InnerEventClient;
+import ru.practicum.application.event.client.EventClient;
 
 import java.util.List;
 import java.util.Set;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     final CategoryRepository categoryRepository;
-    final InnerEventClient innerEventClient;
+    final EventClient eventClient;
 
     @Override
     @Transactional
@@ -88,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new NotFoundException(String.format("Категория с id=%d не существует", catId));
         }
 
-        if (!innerEventClient.existsByCategoryId(catId)) {
+        if (!eventClient.existsByCategoryId(catId)) {
             categoryRepository.deleteById(catId);
         } else {
             throw new ConflictException("Невозможно удаление используемой категории события ");

@@ -15,8 +15,8 @@ import ru.practicum.application.api.request.comment.GetCommentsAdminRequest;
 import ru.practicum.application.comment.mapper.CommentMapper;
 import ru.practicum.application.comment.model.Comment;
 import ru.practicum.application.comment.repository.CommentRepository;
-import ru.practicum.application.event.client.InnerEventClient;
-import ru.practicum.application.user.client.InnerUserClient;
+import ru.practicum.application.event.client.EventClient;
+import ru.practicum.application.user.client.UserClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,8 +28,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    private final InnerUserClient innerUserClient;
-    private final InnerEventClient innerEventClient;
+    private final UserClient userClient;
+    private final EventClient eventClient;
 
     @Override
     @Transactional
@@ -108,7 +108,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private List<Comment> getEventComments(final Long eventId, final int from, final int size) throws NotFoundException {
-        if (!innerEventClient.existsById(eventId)) {
+        if (!eventClient.existsById(eventId)) {
             log.warn("Событие с идентификатором {} не существует в базе данных.", eventId);
             throw new NotFoundException("Событие не найдено.");
         }
@@ -117,11 +117,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private UserDto fetchUser(final Long userId) throws NotFoundException {
-        return innerUserClient.getById(userId);
+        return userClient.getById(userId);
     }
 
     private EventFullDto fetchEvent(final Long eventId) throws NotFoundException {
-        return innerEventClient.getEventById(eventId);
+        return eventClient.getInnerEventById(eventId);
     }
 
     private Comment fetchComment(final Long commentId) throws NotFoundException {

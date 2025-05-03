@@ -13,7 +13,7 @@ import ru.practicum.application.api.exception.ValidationException;
 import ru.practicum.application.api.exception.WrongDataException;
 import ru.practicum.application.api.request.event.UpdateEventUserRequest;
 import ru.practicum.application.event.service.UserEventService;
-import ru.practicum.application.event.ui.UserEventInterface;
+import ru.practicum.application.event.api.UserEventInterface;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class UserEventController implements UserEventInterface {
     }
 
     @Override
-    public EventFullDto getEventById(
+    public EventFullDto getUserEventById(
             Long userId,
             Long eventId
     ) throws ValidationException, NotFoundException {
@@ -50,7 +50,7 @@ public class UserEventController implements UserEventInterface {
     }
 
     @Override
-    public EventFullDto updateEvent(
+    public EventFullDto updateUserEvent(
             Long userId,
             Long eventId,
             UpdateEventUserRequest event

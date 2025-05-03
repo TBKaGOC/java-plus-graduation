@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.application.api.dto.request.EventRequestDto;
 import ru.practicum.application.request.service.EventRequestService;
-import ru.practicum.application.request.ui.InnerEventRequestInterface;
+import ru.practicum.application.request.api.InnerEventRequestInterface;
 
 import java.util.List;
 

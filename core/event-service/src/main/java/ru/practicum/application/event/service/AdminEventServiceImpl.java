@@ -18,15 +18,14 @@ import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.exception.ValidationException;
 import ru.practicum.application.api.exception.WrongDataException;
 import ru.practicum.application.api.request.event.UpdateEventAdminRequest;
+import ru.practicum.application.category.client.CategoryClient;
+import ru.practicum.application.event.client.EventClient;
 import ru.practicum.application.event.repository.EventRepository;
 import ru.practicum.application.event.repository.LocationRepository;
-import ru.practicum.application.category.client.InnerCategoryClient;
-import ru.practicum.application.category.client.PublicCategoryClient;
+import ru.practicum.application.request.client.EventRequestClient;
 import ru.practicum.client.StatsClient;
 import ru.practicum.application.event.mapper.EventMapper;
 import ru.practicum.application.event.model.Event;
-import ru.practicum.application.request.client.InnerEventRequestClient;
-import ru.practicum.application.user.client.InnerUserClient;
 import ru.practicum.application.user.client.UserClient;
 
 import java.time.LocalDateTime;
@@ -45,12 +44,10 @@ public class AdminEventServiceImpl implements AdminEventService {
     final EventRepository eventRepository;
     final LocationRepository locationRepository;
 
-    final InnerEventRequestClient request;
-    final InnerUserClient innerUser;
-    final UserClient user;
-    final InnerCategoryClient innerCategory;
-    final PublicCategoryClient category;
-
+    final EventClient eventClient;
+    final UserClient userClient;
+    final CategoryClient categoryClient;
+    final EventRequestClient requestClient;
     final StatsClient statsClient;
 
     @Override
@@ -74,14 +71,14 @@ public class AdminEventServiceImpl implements AdminEventService {
         if (users == null && categories == null) {
             Map<Long, Event> allEventsWithDates = new ArrayList<>(eventRepository.findAll(PageRequest.of(from / size, size)).getContent())
                     .stream().collect(Collectors.toMap(Event::getId, e -> e));
-            List<EventRequestDto> requestsByEventIds = request.findByEventIds(allEventsWithDates.values().stream()
+            List<EventRequestDto> requestsByEventIds = requestClient.findByEventIds(allEventsWithDates.values().stream()
                     .mapToLong(Event::getId).boxed().collect(Collectors.toList()));
 
-            Map<Long, UserDto> usersByRequests = user.getUsersList(
+            Map<Long, UserDto> usersByRequests = userClient.getUsersList(
                     requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getInitiator())
                             .collect(Collectors.toList()), 0, allEventsWithDates.size()
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
-            Map<Long, CategoryDto> categoriesByRequests = innerCategory.getCategoriesByIds(
+            Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
                     requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategoryId())
                             .collect(Collectors.toSet())
             ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
@@ -100,14 +97,14 @@ public class AdminEventServiceImpl implements AdminEventService {
                     PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "e.eventDate")))
                     .stream().collect(Collectors.toMap(Event::getId, e -> e));
 
-            List<EventRequestDto> requestsByEventIds = request.findByEventIds(allEventsWithDates.values().stream()
+            List<EventRequestDto> requestsByEventIds = requestClient.findByEventIds(allEventsWithDates.values().stream()
                     .mapToLong(Event::getId).boxed().collect(Collectors.toList()));
 
-            Map<Long, UserDto> usersByRequests = user.getUsersList(
+            Map<Long, UserDto> usersByRequests = userClient.getUsersList(
                     requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getInitiator())
                             .collect(Collectors.toList()), 0, allEventsWithDates.size()
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
-            Map<Long, CategoryDto> categoriesByRequests = innerCategory.getCategoriesByIds(
+            Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
                     requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategoryId())
                             .collect(Collectors.toSet())
             ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
@@ -140,7 +137,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                 eventIdsWithViewsCounter.put(Long.parseLong(split[2]), Math.toIntExact(statsDto.getHits()));
             }
             ArrayList<Long> longs = new ArrayList<>(eventIdsWithViewsCounter.keySet());
-            List<EventRequestDto> requests = request.getByEventAndStatus(longs, "CONFIRMED");
+            List<EventRequestDto> requests = requestClient.getByEventAndStatus(longs, "CONFIRMED");
             return eventDtos.stream()
                     .peek(dto -> dto.setConfirmedRequests(
                             requests.stream()
@@ -181,9 +178,9 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
     EventFullDto getEventFullDto(Event event) throws NotFoundException {
-        Long confirmed = request.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
-        return EventMapper.mapEventToFullDto(event, confirmed, category.getCategoryById(event.getCategoryId()),
-                innerUser.getById(event.getInitiator()));
+        Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
+        return EventMapper.mapEventToFullDto(event, confirmed, categoryClient.getCategoryById(event.getCategoryId()),
+                userClient.getById(event.getInitiator()));
     }
 
     Event getEventById(Long eventId) throws NotFoundException {
@@ -196,7 +193,7 @@ public class AdminEventServiceImpl implements AdminEventService {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            if (!innerCategory.existById(updateRequest.getCategory())) {
+            if (!categoryClient.existById(updateRequest.getCategory())) {
                 throw new NotFoundException("Категория не найдена " + updateRequest.getCategory());
             }
             event.setCategoryId(updateRequest.getCategory());

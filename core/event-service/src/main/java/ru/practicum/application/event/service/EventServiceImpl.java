@@ -15,15 +15,14 @@ import ru.practicum.application.api.dto.request.EventRequestDto;
 import ru.practicum.application.api.dto.user.UserDto;
 import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.exception.ValidationException;
+import ru.practicum.application.category.client.CategoryClient;
+import ru.practicum.application.event.client.EventClient;
 import ru.practicum.application.event.repository.EventRepository;
-import ru.practicum.application.category.client.InnerCategoryClient;
-import ru.practicum.application.category.client.PublicCategoryClient;
+import ru.practicum.application.request.client.EventRequestClient;
 import ru.practicum.client.StatsClient;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.application.event.mapper.EventMapper;
 import ru.practicum.application.event.model.Event;
-import ru.practicum.application.request.client.InnerEventRequestClient;
-import ru.practicum.application.user.client.InnerUserClient;
 import ru.practicum.application.user.client.UserClient;
 
 import java.time.LocalDateTime;
@@ -40,12 +39,10 @@ import static ru.practicum.client.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR
 public class EventServiceImpl implements EventService {
     final EventRepository eventRepository;
 
-    final InnerEventRequestClient request;
-    final InnerUserClient innerUser;
-    final UserClient user;
-    final PublicCategoryClient category;
-    final InnerCategoryClient innerCategoryClient;
-
+    final EventClient eventClient;
+    final UserClient userClient;
+    final CategoryClient categoryClient;
+    final EventRequestClient requestClient;
     final StatsClient statsClient;
 
     @Override
@@ -60,12 +57,12 @@ public class EventServiceImpl implements EventService {
         if (!event.getState().equals(EventState.PUBLISHED) && !uri.toLowerCase().contains("admin")) {
             throw new NotFoundException("Такого события не существует");
         }
-        var confirmed = request.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
+        var confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
         EventFullDto eventFullDto = EventMapper.mapEventToFullDto(
                 event,
                 confirmed,
-                category.getCategoryById(event.getCategoryId()),
-                innerUser.getById(event.getInitiator())
+                categoryClient.getCategoryById(event.getCategoryId()),
+                userClient.getById(event.getInitiator())
         );
 
         List<String> urls = Collections.singletonList(uri);
@@ -170,11 +167,11 @@ public class EventServiceImpl implements EventService {
             String[] split = statsDto.getUri().split("/");
             eventIdsWithViewsCounter.put(Long.parseLong(split[2]), Math.toIntExact(statsDto.getHits()));
         }
-        List<EventRequestDto> requests = request.findByEventIds(new ArrayList<>(eventIdsWithViewsCounter.keySet()));
-        Map<Long, UserDto> users = user.getUsersList(
+        List<EventRequestDto> requests = requestClient.findByEventIds(new ArrayList<>(eventIdsWithViewsCounter.keySet()));
+        Map<Long, UserDto> users = userClient.getUsersList(
                 events.stream().map(Event::getInitiator).collect(Collectors.toList()), 0, events.size()
         ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
-        Map<Long, CategoryDto> categories = innerCategoryClient.getCategoriesByIds(
+        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
                 events.stream().map(Event::getCategoryId).collect(Collectors.toSet())
         ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
         return events.stream()

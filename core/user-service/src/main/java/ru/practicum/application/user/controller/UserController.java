@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.application.api.dto.user.UserDto;
 import ru.practicum.application.api.exception.ConflictException;
 import ru.practicum.application.user.service.UserService;
-import ru.practicum.application.user.ui.UserInterface;
+import ru.practicum.application.user.api.UserInterface;
 
 import java.util.List;
 

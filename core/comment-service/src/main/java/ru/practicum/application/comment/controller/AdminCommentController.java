@@ -8,7 +8,7 @@ import ru.practicum.application.api.dto.comment.CommentDto;
 import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.request.comment.GetCommentsAdminRequest;
 import ru.practicum.application.comment.service.CommentService;
-import ru.practicum.application.comment.ui.AdminCommentInterface;
+import ru.practicum.application.comment.api.AdminCommentInterface;
 
 import java.util.Collection;
 

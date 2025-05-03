@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.application.api.dto.category.CategoryDto;
 import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.category.service.CategoryService;
-import ru.practicum.application.category.ui.PublicCategoryInterface;
+import ru.practicum.application.category.api.PublicCategoryInterface;
 
 import java.util.List;
 

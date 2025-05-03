@@ -13,11 +13,11 @@ import ru.practicum.application.api.dto.user.UserDto;
 import ru.practicum.application.api.exception.ConflictException;
 import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.exception.ValidationException;
-import ru.practicum.application.event.client.InnerEventClient;
+import ru.practicum.application.event.client.EventClient;
 import ru.practicum.application.request.mapper.EventRequestMapper;
 import ru.practicum.application.request.model.EventRequest;
 import ru.practicum.application.request.repository.RequestRepository;
-import ru.practicum.application.user.client.InnerUserClient;
+import ru.practicum.application.user.client.UserClient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,15 +32,16 @@ import static ru.practicum.application.api.dto.enums.EventRequestStatus.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventRequestServiceImpl implements EventRequestService {
 
-    final InnerEventClient innerEventRepository;
-    final EventRequestMapper eventRequestMapper;
-    final InnerUserClient innerUserClient;
     final RequestRepository requestRepository;
+    final UserClient userClient;
+    final EventClient eventClient;
+
+    final EventRequestMapper eventRequestMapper;
 
     @Override
     @Transactional
     public EventRequestDto addRequest(Long userId, Long eventId) throws ConflictException, NotFoundException {
-        UserDto user = innerUserClient.getById(userId);
+        UserDto user = userClient.getById(userId);
         EventFullDto event = getEventById(eventId);
 
         if (event.getInitiator().getId().equals(userId)) {
@@ -65,7 +66,7 @@ public class EventRequestServiceImpl implements EventRequestService {
 
     @Override
     public List<EventRequestDto> getUserRequests(Long userId) throws NotFoundException {
-        if (!innerUserClient.existsById(userId)) {
+        if (!userClient.existsById(userId)) {
             throw new NotFoundException("Пользователь не найден userId=" + userId);
         }
         return requestRepository.findByUserId(userId).stream()
@@ -145,7 +146,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     @Transactional
     public EventRequestDto cancelRequest(Long userId, Long requestId) throws NotFoundException, ValidationException {
 
-        if (!innerUserClient.existsById(userId)) {
+        if (!userClient.existsById(userId)) {
             throw new NotFoundException("Пользователь не найден userId=" + userId);
         }
 
@@ -203,7 +204,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     }
 
     private List<EventRequest> getEventRequests(Long userId, Long eventId) throws ValidationException, NotFoundException {
-        UserDto user = innerUserClient.getById(userId);
+        UserDto user = userClient.getById(userId);
         EventFullDto event = getEventById(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new ValidationException("Пользователь не инициатор события c id=" + eventId);
@@ -212,7 +213,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     }
 
     private List<EventRequest> getEventRequestsByEventId(Long eventId) throws NotFoundException {
-        if (innerEventRepository.existsById(eventId)) {
+        if (eventClient.existsById(eventId)) {
             return requestRepository.findByEventId(eventId);
         } else {
             throw new NotFoundException("Событие не найдено eventId=" + eventId);
@@ -220,6 +221,6 @@ public class EventRequestServiceImpl implements EventRequestService {
     }
 
     private EventFullDto getEventById(Long eventId) throws NotFoundException {
-        return innerEventRepository.getEventById(eventId);
+        return eventClient.getInnerEventById(eventId);
     }
 }

@@ -8,7 +8,7 @@ import ru.practicum.application.api.dto.category.CategoryDto;
 import ru.practicum.application.api.exception.ConflictException;
 import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.category.service.CategoryService;
-import ru.practicum.application.category.ui.AdminCategoryInterface;
+import ru.practicum.application.category.api.AdminCategoryInterface;
 
 
 @RestController

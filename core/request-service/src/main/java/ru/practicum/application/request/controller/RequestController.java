@@ -9,7 +9,7 @@ import ru.practicum.application.api.exception.ConflictException;
 import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.exception.ValidationException;
 import ru.practicum.application.request.service.EventRequestService;
-import ru.practicum.application.request.ui.EventRequestInterface;
+import ru.practicum.application.request.api.EventRequestInterface;
 
 import java.util.List;
 

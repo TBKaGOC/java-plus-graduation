@@ -10,7 +10,7 @@ import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.exception.ValidationException;
 import ru.practicum.application.api.request.compilation.UpdateCompilationRequest;
 import ru.practicum.application.compilation.service.CompilationService;
-import ru.practicum.application.compilation.ui.AdminCompilationInterface;
+import ru.practicum.application.compilation.api.AdminCompilationInterface;
 
 @RestController
 @RequiredArgsConstructor

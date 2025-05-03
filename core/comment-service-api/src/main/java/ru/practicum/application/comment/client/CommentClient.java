@@ -1,8 +1,8 @@
 package ru.practicum.application.comment.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import ru.practicum.application.comment.ui.CommentInterface;
+import ru.practicum.application.comment.api.AbstractCommentInterface;
 
 @FeignClient(name = "comment-service")
-public interface CommentClient extends CommentInterface {
+public interface CommentClient extends AbstractCommentInterface {
 }

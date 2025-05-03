@@ -16,7 +16,7 @@ import ru.practicum.application.compilation.mapper.CompilationMapper;
 import ru.practicum.application.compilation.model.Compilation;
 import ru.practicum.application.compilation.model.CompilationEvent;
 import ru.practicum.application.compilation.repository.CompilationRepository;
-import ru.practicum.application.event.client.InnerEventClient;
+import ru.practicum.application.event.client.EventClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompilationServiceImpl implements CompilationService {
     final CompilationRepository compilationRepository;
-    final InnerEventClient innerEventClient;
+    final EventClient eventClient;
 
     @Override
     @Transactional
@@ -40,7 +40,7 @@ public class CompilationServiceImpl implements CompilationService {
         ResponseCompilationDto responseCompilationDto = CompilationMapper.mapToResponseCompilation(
                 compilationRepository.save(compilation)
         );
-        responseCompilationDto.setEvents(innerEventClient.getShortByIds(compilation.getEvents().stream()
+        responseCompilationDto.setEvents(eventClient.getShortByIds(compilation.getEvents().stream()
                 .map(CompilationEvent::getId).collect(Collectors.toList())));
 
         return responseCompilationDto;
@@ -98,7 +98,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     private ResponseCompilationDto compileDtoWithEvents(Compilation compilation) {
         ResponseCompilationDto result = CompilationMapper.mapToResponseCompilation(compilation);
-        result.setEvents(innerEventClient.getShortByIds(compilation.getEvents().stream()
+        result.setEvents(eventClient.getShortByIds(compilation.getEvents().stream()
                 .map(CompilationEvent::getId).collect(Collectors.toList())));
         return result;
     }
