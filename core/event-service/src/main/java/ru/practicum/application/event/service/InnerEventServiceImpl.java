@@ -42,7 +42,7 @@ public class InnerEventServiceImpl implements InnerEventService {
 
     @Override
     public boolean existsByCategoryId(Long categoryId) {
-        return eventRepository.existsByCategoryId(categoryId);
+        return eventRepository.existsByCategory(categoryId);
     }
 
     @Override
@@ -52,11 +52,11 @@ public class InnerEventServiceImpl implements InnerEventService {
                 events.stream().map(Event::getInitiator).collect(Collectors.toList()), 0, events.size()
         ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
         Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
-                events.stream().map(Event::getCategoryId).collect(Collectors.toSet())
+                events.stream().map(Event::getCategory).collect(Collectors.toSet())
         ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
 
         return events.stream().map(
-                e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategoryId()), users.get(e.getInitiator()))
+                e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategory()), users.get(e.getInitiator()))
         ).collect(Collectors.toList());
     }
 }

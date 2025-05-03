@@ -44,7 +44,6 @@ public class AdminEventServiceImpl implements AdminEventService {
     final EventRepository eventRepository;
     final LocationRepository locationRepository;
 
-    final EventClient eventClient;
     final UserClient userClient;
     final CategoryClient categoryClient;
     final EventRequestClient requestClient;
@@ -79,7 +78,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                             .collect(Collectors.toList()), 0, allEventsWithDates.size()
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
             Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
-                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategoryId())
+                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategory())
                             .collect(Collectors.toSet())
             ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
 
@@ -88,7 +87,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                             requestsByEventIds.stream()
                                     .filter(r -> r.getId().equals(e.getId()))
                                     .count(),
-                            categoriesByRequests.get(e.getCategoryId()),
+                            categoriesByRequests.get(e.getCategory()),
                             usersByRequests.get(e.getInitiator())))
                     .toList();
         } else {
@@ -105,7 +104,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                             .collect(Collectors.toList()), 0, allEventsWithDates.size()
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
             Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
-                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategoryId())
+                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategory())
                             .collect(Collectors.toSet())
             ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
 
@@ -114,7 +113,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                             requestsByEventIds.stream()
                                     .filter(r -> r.getEvent().equals(e.getId()))
                                     .count(),
-                            categoriesByRequests.get(e.getCategoryId()),
+                            categoriesByRequests.get(e.getCategory()),
                             usersByRequests.get(e.getInitiator())))
                     .toList();
         }
@@ -179,7 +178,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     EventFullDto getEventFullDto(Event event) throws NotFoundException {
         Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
-        return EventMapper.mapEventToFullDto(event, confirmed, categoryClient.getCategoryById(event.getCategoryId()),
+        return EventMapper.mapEventToFullDto(event, confirmed, categoryClient.getCategoryById(event.getCategory()),
                 userClient.getById(event.getInitiator()));
     }
 
@@ -196,7 +195,7 @@ public class AdminEventServiceImpl implements AdminEventService {
             if (!categoryClient.existById(updateRequest.getCategory())) {
                 throw new NotFoundException("Категория не найдена " + updateRequest.getCategory());
             }
-            event.setCategoryId(updateRequest.getCategory());
+            event.setCategory(updateRequest.getCategory());
         }
         if (updateRequest.getDescription() != null) {
             event.setDescription(updateRequest.getDescription());

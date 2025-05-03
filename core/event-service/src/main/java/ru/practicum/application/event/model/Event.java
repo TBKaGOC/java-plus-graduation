@@ -26,7 +26,7 @@ public class Event {
     String annotation;
 
     @Column(name = "category")
-    Long categoryId;
+    Long category;
 
     @Column(name = "created_on")
     LocalDateTime createdOn;

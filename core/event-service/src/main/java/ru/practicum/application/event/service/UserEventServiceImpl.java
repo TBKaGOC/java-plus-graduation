@@ -27,7 +27,6 @@ import ru.practicum.application.user.client.UserClient;
 import ru.practicum.client.StatsClient;
 import ru.practicum.application.event.mapper.EventMapper;
 import ru.practicum.application.event.model.Event;
-import ru.practicum.application.request.api.InnerEventRequestInterface;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -120,7 +119,7 @@ public class UserEventServiceImpl implements UserEventService {
         eventRepository.save(event);
         Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
         return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed,
-                categoryClient.getCategoryById(event.getCategoryId()), user));
+                categoryClient.getCategoryById(event.getCategory()), user));
     }
 
     private UserDto getUserById(Long userId) throws NotFoundException {
@@ -132,10 +131,10 @@ public class UserEventServiceImpl implements UserEventService {
         UserDto user = getUserById(userId);
         List<Event> allEvents = eventRepository.findAllByInitiator(user.getId(), PageRequest.of(from / count, count));
         Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
-                allEvents.stream().map(Event::getCategoryId).collect(Collectors.toSet())
+                allEvents.stream().map(Event::getCategory).collect(Collectors.toSet())
         ).stream().collect(Collectors.toMap(CategoryDto::getId, c -> c));
         return allEvents.stream()
-                .map(e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategoryId()), user))
+                .map(e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategory()), user))
                 .collect(Collectors.toList());
     }
 
@@ -148,7 +147,7 @@ public class UserEventServiceImpl implements UserEventService {
         }
         Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
         return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed,
-                categoryClient.getCategoryById(event.getCategoryId()), user));
+                categoryClient.getCategoryById(event.getCategory()), user));
     }
 
     // Вспомогательные функции
@@ -166,7 +165,7 @@ public class UserEventServiceImpl implements UserEventService {
             if (!categoryClient.existById(inpEventDto.getCategory())) {
                 throw new NotFoundException("Категория не найдена " + inpEventDto.getCategory());
             }
-            event.setCategoryId(inpEventDto.getCategory());
+            event.setCategory(inpEventDto.getCategory());
         }
         if (inpEventDto.getDescription() != null) {
             event.setDescription(inpEventDto.getDescription());

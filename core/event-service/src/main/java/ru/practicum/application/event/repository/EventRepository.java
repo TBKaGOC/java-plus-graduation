@@ -14,7 +14,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByIdIn(List<Long> ids);
 
-    List<Event> findAllByCategoryId(Long catId);
+    List<Event> findAllByCategory(Long catId);
 
     Page<Event> findAll(Pageable page);
 
@@ -37,9 +37,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "LIMIT :limitSize", nativeQuery = true)
     List<Event> findByParametersWithEnd(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, Integer limitSize);
 
-    @Query("SELECT e FROM Event e WHERE e.initiator.id IN :users " +
+    @Query("SELECT e FROM Event e WHERE e.initiator IN :users " +
             "AND e.state in :states " +
-            "AND e.category.id in :categories " +
+            "AND e.category in :categories " +
             "AND e.eventDate between :rangeStart AND :rangeEnd ")
     List<Event> findAllEventsWithDates(List<Long> users,
                                        List<EventState> states,
@@ -49,7 +49,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                        Pageable page);
 
     @Query("SELECT e FROM Event e " +
-            "WHERE e.category.id in :categories " +
+            "WHERE e.category in :categories " +
             "AND e.state = :state")
     List<Event> findAllByCategoryIdPageable(List<Long> categories, EventState state, Pageable page);
 
@@ -69,7 +69,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT DISTINCT e FROM Event e " +
             "WHERE (e.annotation LIKE COALESCE(:text, e.annotation) OR e.description LIKE COALESCE(:text, e.description)) " +
-            "AND (:categories IS NULL OR e.category.id IN :categories) " +
+            "AND (:categories IS NULL OR e.category IN :categories) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND e.eventDate >= COALESCE(:rangeStart, e.eventDate) " +
             "AND e.eventDate <= COALESCE(:rangeEnd, e.eventDate) " +
@@ -77,5 +77,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "ORDER BY e.eventDate DESC")
     List<Event> findEventList(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, EventState state);
 
-    boolean existsByCategoryId(Long catId);
+    boolean existsByCategory(Long catId);
 }

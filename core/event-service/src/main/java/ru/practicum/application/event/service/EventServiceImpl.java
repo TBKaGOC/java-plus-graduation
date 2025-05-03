@@ -61,7 +61,7 @@ public class EventServiceImpl implements EventService {
         EventFullDto eventFullDto = EventMapper.mapEventToFullDto(
                 event,
                 confirmed,
-                categoryClient.getCategoryById(event.getCategoryId()),
+                categoryClient.getCategoryById(event.getCategory()),
                 userClient.getById(event.getInitiator())
         );
 
@@ -172,10 +172,10 @@ public class EventServiceImpl implements EventService {
                 events.stream().map(Event::getInitiator).collect(Collectors.toList()), 0, events.size()
         ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
         Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
-                events.stream().map(Event::getCategoryId).collect(Collectors.toSet())
+                events.stream().map(Event::getCategory).collect(Collectors.toSet())
         ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
         return events.stream()
-                .map(e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategoryId()), users.get(e.getInitiator())))
+                .map(e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategory()), users.get(e.getInitiator())))
                 .peek(dto -> dto.setConfirmedRequests(
                         requests.stream()
                                 .filter((request -> request.getEvent().equals(dto.getId())))

@@ -53,7 +53,7 @@ public class EventMapper {
     public static Event mapNewEventDtoToEvent(NewEventDto newEvent, CategoryDto category) {
         Event event = new Event();
         event.setAnnotation(newEvent.getAnnotation());
-        event.setCategoryId(category.getId());
+        event.setCategory(category.getId());
         event.setDescription(newEvent.getDescription());
         event.setEventDate(getFromString(newEvent.getEventDate()));
         event.setLocation(mapDtoToLocation(newEvent.getLocation()));
