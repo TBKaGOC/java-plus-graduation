@@ -1,8 +1,0 @@
-package ru.practicum.user.client;
-
-import org.springframework.cloud.openfeign.FeignClient;
-import ru.practicum.user.ui.UserInterface;
-
-@FeignClient(name = "user-service")
-public interface UserClient extends UserInterface {
-}

@@ -1,0 +1,17 @@
+package ru.practicum.application.category.ui;
+
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.application.api.dto.category.CategoryDto;
+import ru.practicum.application.api.exception.NotFoundException;
+
+import java.util.List;
+
+@RequestMapping("/categories")
+public interface PublicCategoryInterface {
+    @GetMapping
+    List<CategoryDto> getAllCategories(@RequestParam(required = false, defaultValue = "0") Integer from,
+                                       @RequestParam(required = false, defaultValue = "10") Integer size);
+
+    @GetMapping("/{catId}")
+    CategoryDto getCategoryById(@PathVariable Long catId) throws NotFoundException;
+}
