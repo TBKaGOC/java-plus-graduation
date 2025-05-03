@@ -37,7 +37,7 @@ public class Event {
     @Column(nullable = false, name = "event_date")
     LocalDateTime eventDate;
 
-    @Column
+    @Column(name = "initiator_id")
     Long initiator;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
