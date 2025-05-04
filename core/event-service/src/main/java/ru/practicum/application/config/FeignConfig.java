@@ -1,4 +1,4 @@
-package ru.practicum.application.compilation.config;
+package ru.practicum.application.config;
 
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;

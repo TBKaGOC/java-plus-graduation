@@ -3,6 +3,7 @@ package ru.practicum.application.compilation.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.application.event.model.Event;
 
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class Compilation {
     String title;
 
     @ManyToMany
-    @JoinTable(name = "compilations_events",
+    @JoinTable(name = "events_compilation",
             joinColumns = @JoinColumn(name = "compilation"),
             inverseJoinColumns = @JoinColumn(name = "event"))
-    List<CompilationEvent> events;
+    List<Event> events;
 }

@@ -1,6 +1,8 @@
 package ru.practicum.application.compilation.api;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.application.api.dto.compilation.ResponseCompilationDto;
 import ru.practicum.application.api.exception.NotFoundException;
 

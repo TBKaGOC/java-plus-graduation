@@ -9,7 +9,7 @@ import ru.practicum.application.api.request.compilation.UpdateCompilationRequest
 import java.util.List;
 
 public interface CompilationService {
-    ResponseCompilationDto addCompilation(NewCompilationDto dto);
+    ResponseCompilationDto addCompilation(NewCompilationDto dto) throws NotFoundException;
 
     ResponseCompilationDto updateCompilation(Long compId, UpdateCompilationRequest compilation) throws NotFoundException;
 

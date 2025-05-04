@@ -12,7 +12,7 @@ import ru.practicum.application.api.request.compilation.UpdateCompilationRequest
 public interface AdminCompilationInterface {
     @PostMapping("/admin/compilations")
     @ResponseStatus(HttpStatus.CREATED)
-    ResponseCompilationDto add(@Valid @RequestBody NewCompilationDto compilationDto);
+    ResponseCompilationDto add(@Valid @RequestBody NewCompilationDto compilationDto) throws NotFoundException;
 
     @PatchMapping("/admin/compilations/{compId}")
     ResponseCompilationDto update(

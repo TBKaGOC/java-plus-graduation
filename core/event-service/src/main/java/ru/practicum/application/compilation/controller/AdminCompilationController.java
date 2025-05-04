@@ -20,7 +20,7 @@ public class AdminCompilationController implements AdminCompilationInterface {
     final CompilationService compilationService;
 
     @Override
-    public ResponseCompilationDto add(NewCompilationDto compilationDto) {
+    public ResponseCompilationDto add(NewCompilationDto compilationDto) throws NotFoundException {
         return compilationService.addCompilation(compilationDto);
     }
 

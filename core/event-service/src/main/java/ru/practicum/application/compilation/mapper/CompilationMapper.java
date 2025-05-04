@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.application.api.dto.compilation.NewCompilationDto;
 import ru.practicum.application.api.dto.compilation.ResponseCompilationDto;
 import ru.practicum.application.compilation.model.Compilation;
-import ru.practicum.application.compilation.model.CompilationEvent;
 
 import java.util.stream.Collectors;
 

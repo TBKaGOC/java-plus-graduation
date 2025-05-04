@@ -39,7 +39,6 @@ import static ru.practicum.client.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR
 public class EventServiceImpl implements EventService {
     final EventRepository eventRepository;
 
-    final EventClient eventClient;
     final UserClient userClient;
     final CategoryClient categoryClient;
     final EventRequestClient requestClient;

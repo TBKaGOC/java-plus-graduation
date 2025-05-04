@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.application.api.dto.enums.EventState;
+import ru.practicum.application.compilation.model.Compilation;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,5 +66,5 @@ public class Event {
     @JoinTable(name = "events_compilations",
             joinColumns = @JoinColumn(name = "event"),
             inverseJoinColumns = @JoinColumn(name = "compilation"))
-    List<EventCompilation> compilationList;
+    List<Compilation> compilationList;
 }
