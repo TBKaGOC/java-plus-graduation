@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>compilation-service-api</artifactId>
+    <artifactId>event-api</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

@@ -86,17 +86,17 @@
 
         <dependency>
             <groupId>ru.practicum</groupId>
-            <artifactId>event-service-api</artifactId>
+            <artifactId>event-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ru.practicum</groupId>
-            <artifactId>user-service-api</artifactId>
+            <artifactId>user-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ru.practicum</groupId>
-            <artifactId>comment-service-api</artifactId>
+            <artifactId>comment-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
