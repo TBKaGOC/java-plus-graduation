@@ -25,7 +25,7 @@ spring:
         - id: request_service_route
           uri: lb://REQUEST-SERVICE
           predicates:
-            - Path=/users/{userId}/**/requests
+            - Path=/users/{userId}/requests/**,/users/{userId}/events/{eventId}/requests/**
         - id: category_service_route
           uri: lb://CATEGORY-SERVICE
           predicates:
