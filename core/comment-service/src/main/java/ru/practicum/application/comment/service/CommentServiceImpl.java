@@ -92,7 +92,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentDto> getAllUserComments(final Long userId) throws NotFoundException {
         UserDto user = fetchUser(userId);
-        return CommentMapper.mapToCommentDto(commentRepository.findByUserId(user.getId()));
+        return CommentMapper.mapToCommentDto(commentRepository.findByUser(user.getId()));
     }
 
     @Override
@@ -113,7 +113,7 @@ public class CommentServiceImpl implements CommentService {
             throw new NotFoundException("Событие не найдено.");
         }
         final PageRequest page = PageRequest.of(from / size, size);
-        return commentRepository.findAllByEventId(eventId, page).getContent();
+        return commentRepository.findAllByEvent(eventId, page).getContent();
     }
 
     private UserDto fetchUser(final Long userId) throws NotFoundException {
