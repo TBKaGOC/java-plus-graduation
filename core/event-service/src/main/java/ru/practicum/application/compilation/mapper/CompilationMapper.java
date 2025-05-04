@@ -13,7 +13,6 @@ public class CompilationMapper {
         Compilation compilation = new Compilation();
         compilation.setTitle(dto.getTitle());
         compilation.setPinned(dto.getPinned());
-        compilation.setEvents(dto.getEvents().stream().map(CompilationEvent::new).collect(Collectors.toList()));
 
         return compilation;
     }
