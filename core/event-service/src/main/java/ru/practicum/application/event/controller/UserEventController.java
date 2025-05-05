@@ -37,7 +37,7 @@ public class UserEventController implements UserEventInterface {
     public EventFullDto addEvent(
             Long userId,
             NewEventDto event
-    ) throws ValidationException, WrongDataException, NotFoundException {
+    ) throws ValidationException, WrongDataException, NotFoundException, ConflictException {
         return eventService.addEvent(userId, event);
     }
 

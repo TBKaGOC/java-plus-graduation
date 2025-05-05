@@ -1,4 +1,4 @@
-package ru.practicum.application.api.exception;
+package ru.practicum.application.user.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -6,10 +6,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.application.api.exception.ConflictException;
+import ru.practicum.application.api.exception.NotFoundException;
+import ru.practicum.application.api.exception.ValidationException;
 
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice("UserErrorHandler")
 @Slf4j
 public class ErrorHandler {
 
@@ -41,6 +44,13 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleWrongData(final ConflictException e) {
         log.error("Conflict: " + e.getMessage());
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(Throwable.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleError(final Throwable e) {
+        log.error("Unknown: " + e.getMessage());
         return Map.of("error", e.getMessage());
     }
 }

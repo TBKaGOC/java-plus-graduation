@@ -12,6 +12,7 @@ import ru.practicum.application.api.dto.enums.StateAction;
 import ru.practicum.application.api.dto.event.EventFullDto;
 import ru.practicum.application.api.dto.event.EventShortDto;
 import ru.practicum.application.api.dto.event.NewEventDto;
+import ru.practicum.application.api.dto.request.EventRequestDto;
 import ru.practicum.application.api.dto.user.UserDto;
 import ru.practicum.application.api.exception.ConflictException;
 import ru.practicum.application.api.exception.NotFoundException;
@@ -47,7 +48,6 @@ public class UserEventServiceImpl implements UserEventService {
 
     final UserClient userClient;
     final CategoryClient categoryClient;
-    final EventClient eventClient;
     final EventRequestClient requestClient;
 
     final StatsClient statsClient;
@@ -68,7 +68,7 @@ public class UserEventServiceImpl implements UserEventService {
     }
 
     @Override
-    public EventFullDto addEvent(Long userId, NewEventDto eventDto) throws ValidationException, WrongDataException, NotFoundException {
+    public EventFullDto addEvent(Long userId, NewEventDto eventDto) throws ValidationException, WrongDataException, NotFoundException, ConflictException {
         log.info("Users...");
         log.info("Добавление нового события пользователем {}", userId);
         UserDto user = getUserById(userId);
@@ -81,8 +81,6 @@ public class UserEventServiceImpl implements UserEventService {
         event.setInitiator(user.getId());
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
-
-        Long confirmedRequests = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
 
         if (event.getPaid() == null) {
             event.setPaid(false);
@@ -97,7 +95,7 @@ public class UserEventServiceImpl implements UserEventService {
         event = eventRepository.save(event);
         log.info("Событие сохранено {}", event.getId());
 
-        return EventMapper.mapEventToFullDto(event, confirmedRequests, category, user);
+        return EventMapper.mapEventToFullDto(event, 0L, category, user);
     }
 
     @Override

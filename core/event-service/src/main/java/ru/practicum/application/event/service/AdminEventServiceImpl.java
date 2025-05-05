@@ -74,11 +74,11 @@ public class AdminEventServiceImpl implements AdminEventService {
                     .mapToLong(Event::getId).boxed().collect(Collectors.toList()));
 
             Map<Long, UserDto> usersByRequests = userClient.getUsersList(
-                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getInitiator())
+                    allEventsWithDates.values().stream().map(Event::getInitiator)
                             .collect(Collectors.toList()), 0, allEventsWithDates.size()
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
             Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
-                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategory())
+                    allEventsWithDates.values().stream().map(Event::getCategory)
                             .collect(Collectors.toSet())
             ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
 
@@ -100,15 +100,15 @@ public class AdminEventServiceImpl implements AdminEventService {
                     .mapToLong(Event::getId).boxed().collect(Collectors.toList()));
 
             Map<Long, UserDto> usersByRequests = userClient.getUsersList(
-                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getInitiator())
+                    allEventsWithDates.values().stream().map(Event::getInitiator)
                             .collect(Collectors.toList()), 0, allEventsWithDates.size()
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
             Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
-                    requestsByEventIds.stream().map(request -> allEventsWithDates.get(request.getEvent()).getCategory())
+                    allEventsWithDates.values().stream().map(Event::getCategory)
                             .collect(Collectors.toSet())
             ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
 
-            eventDtos = allEventsWithDates.values().stream()
+             eventDtos = allEventsWithDates.values().stream()
                     .map(e -> EventMapper.mapEventToFullDto(e,
                             requestsByEventIds.stream()
                                     .filter(r -> r.getEvent().equals(e.getId()))

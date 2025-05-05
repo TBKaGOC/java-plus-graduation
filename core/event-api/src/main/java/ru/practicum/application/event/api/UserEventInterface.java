@@ -27,7 +27,7 @@ public interface UserEventInterface {
     EventFullDto addEvent(
             @PathVariable Long userId,
             @Valid @RequestBody NewEventDto event
-    ) throws ValidationException, WrongDataException, NotFoundException;
+    ) throws ValidationException, WrongDataException, NotFoundException, ConflictException;
 
     @GetMapping("/users/{userId}/events/{eventId}")
     EventFullDto getUserEventById(

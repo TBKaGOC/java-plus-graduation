@@ -10,6 +10,6 @@ public interface InnerCategoryInterface {
     @GetMapping("/inner/category/exist/{categoryId}")
     boolean existById(@PathVariable Long categoryId);
 
-    @GetMapping("/inner/category/ids")
-    List<CategoryDto> getCategoriesByIds(@RequestBody Set<Long> ids);
+    @GetMapping("/inner/category/all")
+    List<CategoryDto> getCategoriesByIds(@RequestParam Set<Long> ids);
 }

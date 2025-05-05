@@ -61,7 +61,8 @@ public class EventRequestServiceImpl implements EventRequestService {
         }
 
         EventRequest newRequest = createNewEventRequest(user, event);
-        return eventRequestMapper.mapRequest(requestRepository.save(newRequest));
+        EventRequest eventRequest = requestRepository.save(newRequest);
+        return eventRequestMapper.mapRequest(eventRequest);
     }
 
     @Override

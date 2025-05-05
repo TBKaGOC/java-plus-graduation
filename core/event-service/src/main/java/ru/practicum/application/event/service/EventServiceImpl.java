@@ -16,7 +16,6 @@ import ru.practicum.application.api.dto.user.UserDto;
 import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.api.exception.ValidationException;
 import ru.practicum.application.category.client.CategoryClient;
-import ru.practicum.application.event.client.EventClient;
 import ru.practicum.application.event.repository.EventRepository;
 import ru.practicum.application.request.client.EventRequestClient;
 import ru.practicum.client.StatsClient;

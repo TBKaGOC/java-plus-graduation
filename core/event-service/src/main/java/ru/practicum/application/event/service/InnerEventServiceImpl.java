@@ -1,6 +1,5 @@
 package ru.practicum.application.event.service;
 
-import jakarta.ws.rs.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -9,6 +8,7 @@ import ru.practicum.application.api.dto.category.CategoryDto;
 import ru.practicum.application.api.dto.event.EventFullDto;
 import ru.practicum.application.api.dto.event.EventShortDto;
 import ru.practicum.application.api.dto.user.UserDto;
+import ru.practicum.application.api.exception.NotFoundException;
 import ru.practicum.application.category.client.CategoryClient;
 import ru.practicum.application.event.repository.EventRepository;
 import ru.practicum.application.event.mapper.EventMapper;
@@ -29,10 +29,12 @@ public class InnerEventServiceImpl implements InnerEventService {
     final CategoryClient categoryClient;
 
     @Override
-    public EventFullDto getEventById(Long eventId) {
-        return EventMapper.mapEventToFullDto(eventRepository.findById(eventId).orElseThrow(
+    public EventFullDto getEventById(Long eventId) throws NotFoundException {
+        Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Не найдено событие " + eventId)
-        ), null, null, null);
+        );
+        return EventMapper.mapEventToFullDto(event, null, categoryClient.getCategoryById(event.getCategory()),
+                userClient.getById(event.getInitiator()));
     }
 
     @Override

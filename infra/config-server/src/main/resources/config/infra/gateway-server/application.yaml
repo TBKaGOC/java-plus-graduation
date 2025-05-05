@@ -5,6 +5,9 @@ spring:
       retry:
         enabled: true
     gateway:
+      error:
+        include-message: never
+        include-body: never
       actuator.verbose.enabled: false
       discovery:
         locator:
