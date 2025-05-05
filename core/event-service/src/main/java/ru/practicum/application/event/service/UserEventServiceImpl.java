@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.practicum.client.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
@@ -128,9 +129,9 @@ public class UserEventServiceImpl implements UserEventService {
     public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer count) throws NotFoundException {
         UserDto user = getUserById(userId);
         List<Event> allEvents = eventRepository.findAllByInitiator(user.getId(), PageRequest.of(from / count, count));
-        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
-                allEvents.stream().map(Event::getCategory).collect(Collectors.toSet())
-        ).stream().collect(Collectors.toMap(CategoryDto::getId, c -> c));
+        Set<Long> categoriesIds = allEvents.stream().map(Event::getCategory).collect(Collectors.toSet());
+        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(categoriesIds).stream()
+                .collect(Collectors.toMap(CategoryDto::getId, c -> c));
         return allEvents.stream()
                 .map(e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategory()), user))
                 .collect(Collectors.toList());
