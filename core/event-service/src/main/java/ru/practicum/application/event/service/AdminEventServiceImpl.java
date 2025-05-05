@@ -75,7 +75,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
             Map<Long, UserDto> usersByRequests = userClient.getUsersList(
                     allEventsWithDates.values().stream().map(Event::getInitiator)
-                            .collect(Collectors.toList()), 0, allEventsWithDates.size()
+                            .collect(Collectors.toList()), 0, Math.max(allEventsWithDates.size(), 1)
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
             Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
                     allEventsWithDates.values().stream().map(Event::getCategory)
@@ -101,7 +101,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
             Map<Long, UserDto> usersByRequests = userClient.getUsersList(
                     allEventsWithDates.values().stream().map(Event::getInitiator)
-                            .collect(Collectors.toList()), 0, allEventsWithDates.size()
+                            .collect(Collectors.toList()), 0, Math.max(allEventsWithDates.size(), 1)
             ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
             Map<Long, CategoryDto> categoriesByRequests = categoryClient.getCategoriesByIds(
                     allEventsWithDates.values().stream().map(Event::getCategory)

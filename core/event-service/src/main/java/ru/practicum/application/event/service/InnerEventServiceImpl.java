@@ -51,7 +51,7 @@ public class InnerEventServiceImpl implements InnerEventService {
     public List<EventShortDto> getShortByIds(List<Long> ids) {
         List<Event> events = eventRepository.findAllById(ids);
         Map<Long, UserDto> users = userClient.getUsersList(
-                events.stream().map(Event::getInitiator).collect(Collectors.toList()), 0, events.size()
+                events.stream().map(Event::getInitiator).collect(Collectors.toList()), 0, Math.max(events.size(), 1)
         ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
         Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
                 events.stream().map(Event::getCategory).collect(Collectors.toSet())
