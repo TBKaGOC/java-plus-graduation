@@ -24,10 +24,7 @@ import ru.practicum.application.event.model.Event;
 import ru.practicum.application.event.repository.EventRepository;
 import ru.practicum.application.user.client.UserClient;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,13 +101,12 @@ public class CompilationServiceImpl implements CompilationService {
                 () -> new NotFoundException("Подборка не найдена " + id)
         );
 
-        Map<Long, UserDto> users = userClient.getUsersList(
-                compilation.getEvents().stream().map(Event::getInitiator).collect(Collectors.toList()),
-                0, Math.max(compilation.getEvents().size(), 1)
+        List<Long> usersIds = compilation.getEvents().stream().map(Event::getInitiator).toList();
+        Set<Long> categoriesIds = compilation.getEvents().stream().map(Event::getCategory).collect(Collectors.toSet());
+        Map<Long, UserDto> users = userClient.getUsersList(usersIds, 0, Math.max(compilation.getEvents().size(), 1)
         ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
-        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
-                compilation.getEvents().stream().map(Event::getCategory).collect(Collectors.toSet())
-        ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
+        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(categoriesIds).stream()
+                .collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
 
         return compileDtoWithEvents(compilation, categories, users);
     }
@@ -139,12 +135,12 @@ public class CompilationServiceImpl implements CompilationService {
             events.addAll(compilation.getEvents());
         }
 
-        Map<Long, UserDto> users = userClient.getUsersList(
-                events.stream().map(Event::getInitiator).collect(Collectors.toList()), 0, Math.max(events.size(), 1)
-        ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
-        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
-                events.stream().map(Event::getCategory).collect(Collectors.toSet())
-        ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
+        List<Long> usersIds = events.stream().map(Event::getInitiator).toList();
+        Set<Long> categoriesIds = events.stream().map(Event::getCategory).collect(Collectors.toSet());
+                Map<Long, UserDto> users = userClient.getUsersList(usersIds, 0, Math.max(events.size(), 1)).stream()
+                .collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
+        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(categoriesIds).stream()
+                .collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
 
         return compilations.stream()
                 .map(compilation -> compileDtoWithEvents(compilation, categories, users))

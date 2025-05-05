@@ -166,12 +166,12 @@ public class EventServiceImpl implements EventService {
             eventIdsWithViewsCounter.put(Long.parseLong(split[2]), Math.toIntExact(statsDto.getHits()));
         }
         List<EventRequestDto> requests = requestClient.findByEventIds(new ArrayList<>(eventIdsWithViewsCounter.keySet()));
-        Map<Long, UserDto> users = userClient.getUsersList(
-                events.stream().map(Event::getInitiator).collect(Collectors.toList()), 0, Math.max(events.size(), 1)
-        ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
-        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
-                events.stream().map(Event::getCategory).collect(Collectors.toSet())
-        ).stream().collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
+        List<Long> usersIds = events.stream().map(Event::getInitiator).toList();
+        Set<Long> categoriesIds = events.stream().map(Event::getCategory).collect(Collectors.toSet());
+        Map<Long, UserDto> users = userClient.getUsersList(usersIds, 0, Math.max(events.size(), 1)).stream()
+                .collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
+        Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(categoriesIds).stream()
+                .collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
         return events.stream()
                 .map(e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategory()), users.get(e.getInitiator())))
                 .peek(dto -> dto.setConfirmedRequests(
