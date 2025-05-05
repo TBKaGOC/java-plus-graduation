@@ -106,7 +106,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         Map<Long, UserDto> users = userClient.getUsersList(
                 compilation.getEvents().stream().map(Event::getInitiator).collect(Collectors.toList()),
-                0, compilation.getEvents().size()
+                0, Math.max(compilation.getEvents().size(), 1)
         ).stream().collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
         Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(
                 compilation.getEvents().stream().map(Event::getCategory).collect(Collectors.toSet())

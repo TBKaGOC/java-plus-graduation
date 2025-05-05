@@ -12,7 +12,7 @@ import ru.practicum.application.api.exception.ValidationException;
 
 import java.util.Map;
 
-@RestControllerAdvice("UserErrorHandler")
+@RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
 

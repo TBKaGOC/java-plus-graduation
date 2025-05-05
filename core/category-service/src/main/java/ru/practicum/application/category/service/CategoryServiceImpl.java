@@ -1,6 +1,7 @@
 package ru.practicum.application.category.service;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryServiceImpl implements CategoryService {
 
