@@ -6,27 +6,25 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.application.api.dto.compilation.ResponseCompilationDto;
 import ru.practicum.application.api.exception.NotFoundException;
+import ru.practicum.application.compilation.api.PublicCompilationInterface;
 import ru.practicum.application.compilation.service.CompilationService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/compilations")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PublicCompilationController {
+public class PublicCompilationController implements PublicCompilationInterface {
 
     final CompilationService compilationService;
 
-    @GetMapping
-    public List<ResponseCompilationDto> getAll(@RequestParam(required = false) Boolean pinned,
-                                               @RequestParam(defaultValue = "0") Integer from,
-                                               @RequestParam(defaultValue = "10") Integer size) {
+    @Override
+    public List<ResponseCompilationDto> getAll(Boolean pinned, Integer from, Integer size) {
         return compilationService.getCompilations(pinned, from, size);
     }
 
-    @GetMapping("/{compId}")
-    public ResponseCompilationDto getCompilationById(@PathVariable Long compId) throws NotFoundException {
+    @Override
+    public ResponseCompilationDto getCompilationById(Long compId) throws NotFoundException {
         return compilationService.getCompilationById(compId);
     }
 
