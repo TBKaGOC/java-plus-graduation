@@ -26,6 +26,8 @@ public class UserActionHandler {
     final Map<Long, Map<Long, Float>>  usersFeedback;
     // Map<Event, Map<Event, MinSum>>
     final Map<Long, Map<Long, Float>> eventsMinWeightSum;
+    // Map<Event, SumWeight>;
+    final Map<Long, Float> eventWeightSum;
 
 
     @Autowired
@@ -33,6 +35,7 @@ public class UserActionHandler {
         this.producer = producer;
         usersFeedback = new HashMap<>();
         eventsMinWeightSum = new HashMap<>();
+        eventWeightSum = new HashMap<>();
     }
 
     public void handle(UserActionAvro avro) throws IncorrectActionTypeException {
@@ -60,6 +63,7 @@ public class UserActionHandler {
     }
 
     private void determineSimilarity(Long eventId, Long userId, Float oldWeight, Float newWeight, Instant timestamp) {
+        eventWeightSum.put(eventId, eventWeightSum.getOrDefault(eventId, 0.0F) - oldWeight + newWeight);
         List<Long> eventsWithSameUsers = usersFeedback.keySet().stream()
                 .filter(e -> usersFeedback.get(e).containsKey(userId) && !Objects.equals(e, eventId))
                 .toList();
@@ -79,18 +83,17 @@ public class UserActionHandler {
                     EventSimilarityAvro.newBuilder()
                             .setEventA(first)
                             .setEventB(second)
-                            .setScore(calculateSimilarity(first, second))
+                            .setScore(calculateSimilarity(first, second, newSum))
                             .setTimestamp(timestamp)
                             .build()
             );
         }
     }
 
-    private float calculateSimilarity(Long first, Long second) {
-        float commonSum = eventsMinWeightSum.get(first).get(second);
-        float firstSum = (float) usersFeedback.get(first).values().stream().mapToDouble(e -> e).sum();
-        float secondSum = (float) usersFeedback.get(second).values().stream().mapToDouble(e -> e).sum();
-        float similarity = (float) (commonSum / (Math.sqrt(firstSum) * Math.sqrt(secondSum)));
+    private double calculateSimilarity(Long first, Long second, Float commonSum) {
+        float firstSum = eventWeightSum.get(first);
+        float secondSum = eventWeightSum.get(second);
+        double similarity = commonSum / (Math.sqrt(firstSum) * Math.sqrt(secondSum));
 
         log.info("Определно сходство событий {} и {}: {}", first, second, similarity);
         return similarity;

@@ -27,7 +27,7 @@ public class UserActionSerializer implements Serializer<UserActionAvro> {
 
             return stream.toByteArray();
         } catch (IOException e) {
-            throw new SerializationException("Ошибка сериализации SensorEvent", e);
+            throw new SerializationException("Ошибка сериализации UserAction", e);
         }
     }
 }
