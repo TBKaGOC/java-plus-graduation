@@ -15,7 +15,7 @@ public class UserActionMapper {
         return new UserActionId(avro.getUserId(), avro.getEventId());
     }
 
-    private static double convertActionToWeight(ActionTypeAvro action){
+    public static double convertActionToWeight(ActionTypeAvro action){
         switch (action) {
             case VIEW -> {
                 return  0.4;
