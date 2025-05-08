@@ -32,6 +32,6 @@ public interface RequestRepository extends JpaRepository<EventRequest, Long> {
             "AND r.status = :status")
     List<EventRequest> findByEventIdsAndStatus(List<Long> eventIds, String status);
 
-    @Query("SELECT COUNT(r) > 0 FROM EventRequest e WHERE requester = :requester AND event = :event")
+    @Query("SELECT COUNT(r) > 0 FROM EventRequest r WHERE r.requester = :requester AND r.event = :event")
     boolean userTakePart(Long requester, Long event);
 }
