@@ -5,11 +5,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.stats.proto.UserActionControllerGrpc;
 import ru.practicum.ewm.stats.proto.UserActionProto;
 
-@Service
+@Component
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CollectorClient {

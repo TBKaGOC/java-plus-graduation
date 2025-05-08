@@ -5,12 +5,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.stats.proto.*;
 
 import java.util.List;
 
-@Service
+@Component
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AnalyzerClient {
