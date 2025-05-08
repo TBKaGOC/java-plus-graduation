@@ -8,9 +8,13 @@ import org.apache.kafka.common.serialization.VoidDeserializer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import ru.practicum.ewm.stats.avro.EventSimilarityAvro;
-import ru.practicum.stats.analyzer.handler.SimilarityHandler;
+import ru.practicum.ewm.stats.avro.UserActionAvro;
+import ru.practicum.stats.analyzer.kafka.UserActionDeserializer;
+import ru.practicum.stats.analyzer.service.SimilarityService;
 import ru.practicum.stats.analyzer.kafka.SimilarityDeserializer;
-import ru.practicum.stats.analyzer.starter.AnalyzerStarter;
+import ru.practicum.stats.analyzer.service.UserActionService;
+import ru.practicum.stats.analyzer.starter.SimilarityStarter;
+import ru.practicum.stats.analyzer.starter.UserActionStarter;
 
 import java.util.List;
 import java.util.Properties;
@@ -23,9 +27,9 @@ public class KafkaConfig {
     private final String similarity;
 
     @Bean
-    public AnalyzerStarter analyzerStarter(SimilarityHandler handler) {
+    public SimilarityStarter similarityStarter(SimilarityService service) {
         Properties properties = new Properties();
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "action");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "similarity");
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, url);
@@ -35,6 +39,22 @@ public class KafkaConfig {
         Consumer<String, EventSimilarityAvro> consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(List.of(similarity));
 
-        return new AnalyzerStarter(consumer, handler);
+        return new SimilarityStarter(consumer, service);
+    }
+
+    @Bean
+    public UserActionStarter  userActionStarter(UserActionService service) {
+        Properties properties = new Properties();
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "action");
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, url);
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, VoidDeserializer.class);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, UserActionDeserializer.class);
+
+        Consumer<String, UserActionAvro> consumer = new KafkaConsumer<>(properties);
+        consumer.subscribe(List.of(action));
+
+        return new UserActionStarter(consumer, service);
     }
 }
