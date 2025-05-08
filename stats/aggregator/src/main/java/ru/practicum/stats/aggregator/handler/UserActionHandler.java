@@ -1,7 +1,6 @@
 package ru.practicum.stats.aggregator.handler;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +11,8 @@ import ru.practicum.ewm.stats.avro.UserActionAvro;
 import ru.practicum.stats.aggregator.exception.IncorrectActionTypeException;
 import ru.practicum.stats.aggregator.kafka.SimilarityProducer;
 
-import javax.swing.event.ListDataEvent;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -66,29 +63,26 @@ public class UserActionHandler {
 
     private void determineSimilarity(Long eventId, Long userId, Double oldWeight, Double newWeight, Instant timestamp) {
         eventWeightSum.put(eventId, eventWeightSum.getOrDefault(eventId, 0.0) - oldWeight + newWeight);
-        List<Long> eventsWithSameUsers = usersFeedback.keySet().stream()
-                .filter(e -> usersFeedback.get(e).containsKey(userId) && !Objects.equals(e, eventId))
-                .toList();
 
-        for (Long convergenceEvent: eventsWithSameUsers) {
-            Double convergenceWeight = usersFeedback.getOrDefault(convergenceEvent, new HashMap<>())
-                    .getOrDefault(userId, 0.0);
-            Long first = Math.min(eventId, convergenceEvent);
-            Long second = Math.max(eventId, convergenceEvent);
-            Double oldSum = eventsMinWeightSum.getOrDefault(first, new HashMap<>()).getOrDefault(second, 0.0);
-            Double newSum = oldSum - Math.min(oldWeight, convergenceWeight) + Math.min(newWeight, convergenceWeight);
-            Map<Long, Double> userRating = new HashMap<>(eventsMinWeightSum.getOrDefault(first, new HashMap<>()));
-            userRating.put(second, newSum);
-            eventsMinWeightSum.put(first, userRating);
-            EventSimilarityAvro eventSimilarityAvro = EventSimilarityAvro.newBuilder()
-                    .setEventA(first)
-                    .setEventB(second)
-                    .setScore(calculateSimilarity(first, second, newSum))
-                    .setTimestamp(timestamp)
-                    .build();
+        for (Long convergenceEvent: usersFeedback.keySet()) {
+            if (usersFeedback.get(convergenceEvent).containsKey(userId) &&
+                    !Objects.equals(convergenceEvent, eventId)) {
+                Double convergenceWeight = usersFeedback.getOrDefault(convergenceEvent, new HashMap<>())
+                        .getOrDefault(userId, 0.0);
+                Long first = Math.min(eventId, convergenceEvent);
+                Long second = Math.max(eventId, convergenceEvent);
+                Double oldSum = eventsMinWeightSum.getOrDefault(first, new HashMap<>()).getOrDefault(second, 0.0);
+                Double newSum = oldSum - Math.min(oldWeight, convergenceWeight) + Math.min(newWeight, convergenceWeight);
+                Map<Long, Double> userRating = new HashMap<>(eventsMinWeightSum.getOrDefault(first, new HashMap<>()));
+                userRating.put(second, newSum);
+                eventsMinWeightSum.put(first, userRating);
+                EventSimilarityAvro eventSimilarityAvro = EventSimilarityAvro.newBuilder()
+                        .setEventA(first)
+                        .setEventB(second)
+                        .setScore(calculateSimilarity(first, second, newSum))
+                        .setTimestamp(timestamp)
+                        .build();
 
-            if (eventsSimilarity.getOrDefault(first, new HashMap<>()).getOrDefault(second, -1.0) !=
-                    eventSimilarityAvro.getScore()) {
                 Map<Long, Double> inner = eventsSimilarity.getOrDefault(first, new HashMap<>());
                 inner.put(second, eventSimilarityAvro.getScore());
                 eventsSimilarity.put(first, inner);
