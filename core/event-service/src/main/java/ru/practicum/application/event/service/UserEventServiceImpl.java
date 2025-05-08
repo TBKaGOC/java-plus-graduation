@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.application.api.dto.category.CategoryDto;
@@ -48,6 +49,7 @@ public class UserEventServiceImpl implements UserEventService {
     final UserClient userClient;
     final CategoryClient categoryClient;
     final EventRequestClient requestClient;
+    @Lazy
     final AnalyzerClient analyzerClient;
 
     private static void validationEventDate(Event event) throws ValidationException, WrongDataException {
