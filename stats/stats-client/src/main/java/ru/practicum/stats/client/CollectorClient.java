@@ -12,11 +12,10 @@ import ru.practicum.ewm.stats.proto.UserActionControllerGrpc;
 import ru.practicum.ewm.stats.proto.UserActionProto;
 
 @Component
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CollectorClient {
     @GrpcClient("collector")
-    final UserActionControllerGrpc.UserActionControllerBlockingStub client;
+    UserActionControllerGrpc.UserActionControllerBlockingStub client;
 
     public void sendUserAction(UserActionProto action) {
         Empty empty = client.collectUserAction(action);
