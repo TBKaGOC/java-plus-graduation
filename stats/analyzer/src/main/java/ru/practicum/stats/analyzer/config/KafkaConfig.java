@@ -45,7 +45,7 @@ public class KafkaConfig {
     @Bean
     public UserActionStarter  userActionStarter(UserActionService service) {
         Properties properties = new Properties();
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "action");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "analyzer_action");
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, url);

@@ -17,7 +17,7 @@ public class UserActionService {
     final UserActionRepository repository;
 
     public void save(UserActionAvro avro) {
-        log.info("Сохранинеия дайстви {} пользователя {} для события {}", avro.getActionType(),
+        log.info("Сохранинеия дайствия {} пользователя {} для события {}", avro.getActionType(),
                 avro.getUserId(), avro.getEventId());
         repository.deleteById(UserActionMapper.mapAvroToKey(avro));
         repository.save(UserActionMapper.mapAvroToEntity(avro));
