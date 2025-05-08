@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.stats.proto.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AnalyzerClient {
     @GrpcClient("analyzer")
+    @Lazy
     final RecommendationsControllerGrpc.RecommendationsControllerBlockingStub client;
 
     public List<RecommendedEventProto> getInteractionsCount(InteractionsCountRequestProto request) {
