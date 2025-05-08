@@ -79,28 +79,22 @@ public class UserActionHandler {
             eventsMinWeightSum.put(pair, newMinSum);
 
             double similarity = calculateSimilarity(pair, newMinSum);
-            Double prevSimilarity = eventsSimilarity.get(pair);
 
-            if (prevSimilarity == null) {
-                eventsSimilarity.put(pair, similarity);
+            eventsSimilarity.put(pair, similarity);
 
-                EventSimilarityAvro message = EventSimilarityAvro.newBuilder()
-                        .setEventA(pair.first())
-                        .setEventB(pair.second())
-                        .setScore(similarity)
-                        .setTimestamp(timestamp)
-                        .build();
-
-                producer.sendMessage(message);
-            }
+            EventSimilarityAvro message = EventSimilarityAvro.newBuilder()
+                    .setEventA(pair.first())
+                    .setEventB(pair.second())
+                    .setScore(similarity)
+                    .setTimestamp(timestamp)
+                    .build();
+            producer.sendMessage(message);
         }
     }
 
     private double calculateSimilarity(EventPair pair, double commonSum) {
         double sqrtA = getSqrtSum(pair.first());
         double sqrtB = getSqrtSum(pair.second());
-
-        if (sqrtA == 0.0 || sqrtB == 0.0) return 0.0;
 
         double similarity = commonSum / (sqrtA * sqrtB);
         log.info("Определено сходство событий {} и {}: {}", pair.first(), pair.second(), similarity);
