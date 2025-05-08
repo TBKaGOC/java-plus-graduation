@@ -23,7 +23,6 @@ public class UserActionService {
         UserActionId id = UserActionMapper.mapAvroToKey(avro);
         if (!repository.existsById(id) ||
             repository.findById(id).get().getScore() < UserActionMapper.convertActionToWeight(avro.getActionType())) {
-            repository.deleteById(UserActionMapper.mapAvroToKey(avro));
             repository.save(UserActionMapper.mapAvroToEntity(avro));
         }
     }
