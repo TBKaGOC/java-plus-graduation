@@ -16,7 +16,6 @@ import ru.practicum.ewm.stats.proto.UserActionProto;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CollectorClient {
     @GrpcClient("collector")
-    @Lazy
     final UserActionControllerGrpc.UserActionControllerBlockingStub client;
 
     public void sendUserAction(UserActionProto action) {

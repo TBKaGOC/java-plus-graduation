@@ -17,7 +17,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AnalyzerClient {
     @GrpcClient("analyzer")
-    @Lazy
     final RecommendationsControllerGrpc.RecommendationsControllerBlockingStub client;
 
     public List<RecommendedEventProto> getInteractionsCount(InteractionsCountRequestProto request) {
