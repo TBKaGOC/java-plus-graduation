@@ -19,13 +19,11 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserActionHandler {
     final SimilarityProducer producer;
-    // Map<Event, Map<User, Weight>>
-    final Map<Long, Map<Long, Double>>  usersFeedback;
-    // Map<Event, Map<Event, MinSum>>
-    final Map<Long, Map<Long, Double>> eventsMinWeightSum;
-    // Map<Event, SumWeight>;
+    final Map<Long, Map<Long, Double>> usersFeedback;
+    final Map<EventPair, Double> eventsMinWeightSum;
     final Map<Long, Double> eventWeightSum;
-    final Map<Long, Map<Long, Double>> eventsSimilarity;
+    final Map<EventPair, Double> eventsSimilarity;
+    final Map<Long, Double> sqrtCache;
 
 
     @Autowired
@@ -35,16 +33,18 @@ public class UserActionHandler {
         eventsMinWeightSum = new HashMap<>();
         eventWeightSum = new HashMap<>();
         eventsSimilarity = new HashMap<>();
+        sqrtCache = new HashMap<>();
     }
 
     public void handle(UserActionAvro avro) throws IncorrectActionTypeException {
         Long userId = avro.getUserId();
         Long eventId = avro.getEventId();
         Double weight = convertActionToWeight(avro.getActionType());
-        Map<Long, Double> userRatings = new HashMap<>(usersFeedback.computeIfAbsent(eventId, key -> Map.of(userId, weight)));
 
-        if (!userRatings.containsKey(userId) || userRatings.get(userId) < weight) {
-            Double oldWeight = userRatings.getOrDefault(userId, 0.0);
+        Map<Long, Double> userRatings = usersFeedback.computeIfAbsent(eventId, k -> new HashMap<>());
+        Double oldWeight = userRatings.getOrDefault(userId, 0.0);
+
+        if (oldWeight < weight) {
             userRatings.put(userId, weight);
             usersFeedback.put(eventId, userRatings);
             determineSimilarity(eventId, userId, oldWeight, weight, avro.getTimestamp());
@@ -62,42 +62,53 @@ public class UserActionHandler {
     }
 
     private void determineSimilarity(Long eventId, Long userId, Double oldWeight, Double newWeight, Instant timestamp) {
-        eventWeightSum.put(eventId, eventWeightSum.getOrDefault(eventId, 0.0) - oldWeight + newWeight);
+        double newSum = eventWeightSum.getOrDefault(eventId, 0.0) - oldWeight + newWeight;
+        eventWeightSum.put(eventId, newSum);
+        sqrtCache.remove(eventId); // Сброс кэша корня
 
-        for (Long convergenceEvent: usersFeedback.keySet()) {
-            if (usersFeedback.get(convergenceEvent).containsKey(userId) &&
-                    !Objects.equals(convergenceEvent, eventId)) {
-                Double convergenceWeight = usersFeedback.getOrDefault(convergenceEvent, new HashMap<>())
-                        .getOrDefault(userId, 0.0);
-                Long first = Math.min(eventId, convergenceEvent);
-                Long second = Math.max(eventId, convergenceEvent);
-                Double oldSum = eventsMinWeightSum.getOrDefault(first, new HashMap<>()).getOrDefault(second, 0.0);
-                Double newSum = oldSum - Math.min(oldWeight, convergenceWeight) + Math.min(newWeight, convergenceWeight);
-                Map<Long, Double> userRating = new HashMap<>(eventsMinWeightSum.getOrDefault(first, new HashMap<>()));
-                userRating.put(second, newSum);
-                eventsMinWeightSum.put(first, userRating);
-                EventSimilarityAvro eventSimilarityAvro = EventSimilarityAvro.newBuilder()
-                        .setEventA(first)
-                        .setEventB(second)
-                        .setScore(calculateSimilarity(first, second, newSum))
+        for (Map.Entry<Long, Map<Long, Double>> entry : usersFeedback.entrySet()) {
+            Long otherEventId = entry.getKey();
+            Map<Long, Double> feedback = entry.getValue();
+            if (!feedback.containsKey(userId) || Objects.equals(otherEventId, eventId)) continue;
+
+            double convergenceWeight = feedback.getOrDefault(userId, 0.0);
+            EventPair pair = EventPair.of(eventId, otherEventId);
+
+            double oldMinSum = eventsMinWeightSum.getOrDefault(pair, 0.0);
+            double newMinSum = oldMinSum - Math.min(oldWeight, convergenceWeight) + Math.min(newWeight, convergenceWeight);
+            eventsMinWeightSum.put(pair, newMinSum);
+
+            double similarity = calculateSimilarity(pair, newMinSum);
+            Double prevSimilarity = eventsSimilarity.get(pair);
+
+            if (prevSimilarity == null) {
+                eventsSimilarity.put(pair, similarity);
+
+                EventSimilarityAvro message = EventSimilarityAvro.newBuilder()
+                        .setEventA(pair.first())
+                        .setEventB(pair.second())
+                        .setScore(similarity)
                         .setTimestamp(timestamp)
                         .build();
 
-                Map<Long, Double> inner = eventsSimilarity.getOrDefault(first, new HashMap<>());
-                inner.put(second, eventSimilarityAvro.getScore());
-                eventsSimilarity.put(first, inner);
-                producer.sendMessage(eventSimilarityAvro);
+                producer.sendMessage(message);
             }
         }
     }
 
-    private double calculateSimilarity(Long first, Long second, Double commonSum) {
-        double firstSum = eventWeightSum.get(first);
-        double secondSum = eventWeightSum.get(second);
-        double similarity = commonSum / (Math.sqrt(firstSum) * Math.sqrt(secondSum));
+    private double calculateSimilarity(EventPair pair, double commonSum) {
+        double sqrtA = getSqrtSum(pair.first());
+        double sqrtB = getSqrtSum(pair.second());
 
-        log.info("Определно сходство событий {} и {}: {}", first, second, similarity);
+        if (sqrtA == 0.0 || sqrtB == 0.0) return 0.0;
+
+        double similarity = commonSum / (sqrtA * sqrtB);
+        log.info("Определено сходство событий {} и {}: {}", pair.first(), pair.second(), similarity);
         return similarity;
+    }
+
+    private double getSqrtSum(Long eventId) {
+        return sqrtCache.computeIfAbsent(eventId, id -> Math.sqrt(eventWeightSum.getOrDefault(id, 0.0)));
     }
 
     private Double convertActionToWeight(ActionTypeAvro action) throws IncorrectActionTypeException {
@@ -115,6 +126,12 @@ public class UserActionHandler {
                 log.warn("Неверный тип действия пользователя: {}", action);
                 throw new IncorrectActionTypeException("Неверный тип действия пользователя: " + action);
             }
+        }
+    }
+
+    record EventPair(Long first, Long second) {
+        public static EventPair of(Long a, Long b) {
+            return a < b ? new EventPair(a, b) : new EventPair(b, a);
         }
     }
 }
