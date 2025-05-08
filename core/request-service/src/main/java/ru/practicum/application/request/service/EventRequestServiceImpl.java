@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.application.api.dto.enums.EventState;
@@ -41,7 +40,6 @@ public class EventRequestServiceImpl implements EventRequestService {
     final RequestRepository requestRepository;
     final UserClient userClient;
     final EventClient eventClient;
-    @Lazy
     final CollectorClient collectorClient;
 
     final EventRequestMapper eventRequestMapper;
