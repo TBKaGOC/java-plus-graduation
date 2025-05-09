@@ -46,10 +46,7 @@ public class UserActionHandler {
 
         if (oldWeight < weight) {
             userRatings.put(userId, weight);
-            usersFeedback.put(eventId, userRatings);
             determineSimilarity(eventId, userId, oldWeight, weight, avro.getTimestamp());
-        } else if (userRatings.size() == 1) {
-            determineSimilarity(eventId, userId, 0.0, weight, avro.getTimestamp());
         }
     }
 
@@ -64,14 +61,14 @@ public class UserActionHandler {
     private void determineSimilarity(Long eventId, Long userId, Double oldWeight, Double newWeight, Instant timestamp) {
         double newSum = eventWeightSum.getOrDefault(eventId, 0.0) - oldWeight + newWeight;
         eventWeightSum.put(eventId, newSum);
-        sqrtCache.remove(eventId); // Сброс кэша корня
+        sqrtCache.remove(eventId);
 
         for (Map.Entry<Long, Map<Long, Double>> entry : usersFeedback.entrySet()) {
             Long otherEventId = entry.getKey();
             Map<Long, Double> feedback = entry.getValue();
             if (!feedback.containsKey(userId) || Objects.equals(otherEventId, eventId)) continue;
 
-            double convergenceWeight = feedback.getOrDefault(userId, 0.0);
+            double convergenceWeight = feedback.get(userId);
             EventPair pair = EventPair.of(eventId, otherEventId);
 
             double oldMinSum = eventsMinWeightSum.getOrDefault(pair, 0.0);
