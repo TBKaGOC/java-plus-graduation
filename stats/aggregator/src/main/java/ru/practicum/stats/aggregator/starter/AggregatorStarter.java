@@ -31,6 +31,8 @@ public class AggregatorStarter {
 
                 for (ConsumerRecord<String, UserActionAvro> record : records) {
                     handler.handle(record.value());
+                    handler.flush();
+                    consumer.commitAsync();
                 }
             }
         } catch (WakeupException e) {
