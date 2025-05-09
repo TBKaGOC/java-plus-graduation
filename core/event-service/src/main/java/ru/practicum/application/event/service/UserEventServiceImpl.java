@@ -26,6 +26,7 @@ import ru.practicum.application.user.client.UserClient;
 import ru.practicum.application.event.mapper.EventMapper;
 import ru.practicum.application.event.model.Event;
 import ru.practicum.ewm.stats.proto.InteractionsCountRequestProto;
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 import ru.practicum.stats.client.AnalyzerClient;
 
 import java.time.LocalDateTime;
@@ -205,10 +206,10 @@ public class UserEventServiceImpl implements UserEventService {
     }
 
     EventFullDto getRatingCounter(EventFullDto eventFullDto) {
-
-        Double rating = analyzerClient.getInteractionsCount(
-                InteractionsCountRequestProto.newBuilder().setEventId(0, eventFullDto.getId()).build()
-        ).getFirst().getScore();
+        List<RecommendedEventProto> protos = analyzerClient.getInteractionsCount(
+                InteractionsCountRequestProto.newBuilder().addEventId(eventFullDto.getId()).build()
+        );
+        Double rating = protos.isEmpty() ? 0.0 : protos.getFirst().getScore();
         eventFullDto.setRating(rating);
         return eventFullDto;
     }

@@ -64,12 +64,10 @@ public class EventServiceImpl implements EventService {
                 userClient.getById(event.getInitiator())
         );
 
-        List<String> urls = Collections.singletonList(uri);
-        LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
-        LocalDateTime end = LocalDateTime.now();
-        var rating = analyzerClient.getInteractionsCount(
+        List<RecommendedEventProto> proto = analyzerClient.getInteractionsCount(
                 getInteractionsRequest(eventId)
-        ).getFirst().getScore();
+        );
+        Double rating = proto.isEmpty() ? 0.0 : proto.getFirst().getScore();
         eventFullDto.setRating(rating);
         return eventFullDto;
     }
@@ -197,14 +195,16 @@ public class EventServiceImpl implements EventService {
                                 .filter((request -> request.getEvent().equals(dto.getId())))
                                 .count()
                 ))
-                .peek(dto -> dto.setRating(
-                        analyzerClient.getInteractionsCount(getInteractionsRequest(dto.getId())).getFirst().getScore())
-                )
+                .peek(dto -> {
+                    List<RecommendedEventProto> proto = analyzerClient.getInteractionsCount(getInteractionsRequest(dto.getId()));
+                    dto.setRating(proto.isEmpty() ? 0.0 : proto.getFirst().getScore());
+
+                })
                 .collect(Collectors.toList());
     }
 
     private static InteractionsCountRequestProto getInteractionsRequest(Long eventId) {
-        return InteractionsCountRequestProto.newBuilder().setEventId(0, eventId).build();
+        return InteractionsCountRequestProto.newBuilder().addEventId(eventId).build();
     }
 
     UserActionProto createUserAction(Long eventId, Long userId, ActionTypeProto type, Instant timestamp) {

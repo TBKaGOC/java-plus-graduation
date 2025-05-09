@@ -26,6 +26,7 @@ import ru.practicum.application.event.mapper.EventMapper;
 import ru.practicum.application.event.model.Event;
 import ru.practicum.application.user.client.UserClient;
 import ru.practicum.ewm.stats.proto.InteractionsCountRequestProto;
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 import ru.practicum.stats.client.AnalyzerClient;
 
 import java.time.LocalDateTime;
@@ -132,9 +133,12 @@ public class AdminEventServiceImpl implements AdminEventService {
                                     .filter((request -> request.getEvent().equals(dto.getId())))
                                     .count()
                     ))
-                    .peek(dto -> dto.setRating(analyzerClient.getInteractionsCount(
-                            InteractionsCountRequestProto.newBuilder().setEventId(0, dto.getId()).build()
-                    ).getFirst().getScore()))
+                    .peek(dto -> {
+                        List<RecommendedEventProto> protos = analyzerClient.getInteractionsCount(
+                                InteractionsCountRequestProto.newBuilder().addEventId(dto.getId()).build()
+                        );
+                        dto.setRating(protos.isEmpty() ? 0.0 : protos.getFirst().getScore());
+                    })
                     .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
@@ -230,9 +234,10 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
     EventFullDto getViewsCounter(EventFullDto eventFullDto) {
-        Double rating = analyzerClient.getInteractionsCount(
-                InteractionsCountRequestProto.newBuilder().setEventId(0, eventFullDto.getId()).build()
-        ).getFirst().getScore();
+        List<RecommendedEventProto> protos = analyzerClient.getInteractionsCount(
+                InteractionsCountRequestProto.newBuilder().addEventId(eventFullDto.getId()).build()
+        );
+        Double rating = protos.isEmpty() ? 0.0 : protos.getFirst().getScore();
         eventFullDto.setRating(rating);
         return eventFullDto;
     }
