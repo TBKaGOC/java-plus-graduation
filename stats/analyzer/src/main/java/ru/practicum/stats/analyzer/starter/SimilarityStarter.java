@@ -1,5 +1,6 @@
 package ru.practicum.stats.analyzer.starter;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -50,5 +51,12 @@ public class SimilarityStarter implements Runnable {
                 log.info("Закрываем продюсер");
             }
         }
+    }
+
+    @PostConstruct
+    public void init() {
+        Thread thread = new Thread(this);
+        thread.setName("similarity");
+        thread.start();
     }
 }

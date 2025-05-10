@@ -1,5 +1,6 @@
 package ru.practicum.stats.aggregator.starter;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -51,5 +52,10 @@ public class AggregatorStarter {
                 handler.close();
             }
         }
+    }
+
+    @PostConstruct
+    public void init() {
+        start();
     }
 }

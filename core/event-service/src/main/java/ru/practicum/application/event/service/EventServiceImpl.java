@@ -65,7 +65,7 @@ public class EventServiceImpl implements EventService {
         );
 
         List<RecommendedEventProto> proto = analyzerClient.getInteractionsCount(
-                getInteractionsRequest(eventId)
+                getInteractionsRequest(List.of(eventId))
         );
         Double rating = proto.isEmpty() ? 0.0 : proto.getFirst().getScore();
         eventFullDto.setRating(rating);
@@ -188,6 +188,11 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
         Map<Long, CategoryDto> categories = categoryClient.getCategoriesByIds(categoriesIds).stream()
                 .collect(Collectors.toMap(CategoryDto::getId, categoryDto -> categoryDto));
+        InteractionsCountRequestProto proto = getInteractionsRequest(
+                events.stream().map(Event::getId).collect(Collectors.toList())
+        );
+        Map<Long, Double> eventRating = analyzerClient.getInteractionsCount(proto)
+                .stream().collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
         return events.stream()
                 .map(e -> EventMapper.mapEventToShortDto(e, categories.get(e.getCategory()), users.get(e.getInitiator())))
                 .peek(dto -> dto.setConfirmedRequests(
@@ -195,16 +200,12 @@ public class EventServiceImpl implements EventService {
                                 .filter((request -> request.getEvent().equals(dto.getId())))
                                 .count()
                 ))
-                .peek(dto -> {
-                    List<RecommendedEventProto> proto = analyzerClient.getInteractionsCount(getInteractionsRequest(dto.getId()));
-                    dto.setRating(proto.isEmpty() ? 0.0 : proto.getFirst().getScore());
-
-                })
+                .peek(dto -> eventRating.getOrDefault(dto.getId(), 0.0))
                 .collect(Collectors.toList());
     }
 
-    private static InteractionsCountRequestProto getInteractionsRequest(Long eventId) {
-        return InteractionsCountRequestProto.newBuilder().addEventId(eventId).build();
+    private InteractionsCountRequestProto getInteractionsRequest(List<Long> eventId) {
+        return InteractionsCountRequestProto.newBuilder().addAllEventId(eventId).build();
     }
 
     UserActionProto createUserAction(Long eventId, Long userId, ActionTypeProto type, Instant timestamp) {

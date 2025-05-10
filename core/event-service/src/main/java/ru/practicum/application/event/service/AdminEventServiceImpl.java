@@ -120,25 +120,19 @@ public class AdminEventServiceImpl implements AdminEventService {
         }
 
         if (!eventDtos.isEmpty()) {
-            HashMap<Long, Integer> eventIdsWithViewsCounter = new HashMap<>();
-            for (EventFullDto dto : eventDtos) {
-                eventIdsWithViewsCounter.put(dto.getId(), 0);
-            }
             ArrayList<Long> longs = eventDtos.stream()
                     .map(EventFullDto::getId).collect(Collectors.toCollection(ArrayList::new));
             List<EventRequestDto> requests = requestClient.getByEventAndStatus(longs, "CONFIRMED");
+            Map<Long, Double> eventRating = analyzerClient.getInteractionsCount(getInteractionsRequest(longs))
+                    .stream().collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
+
             return eventDtos.stream()
                     .peek(dto -> dto.setConfirmedRequests(
                             requests.stream()
                                     .filter((request -> request.getEvent().equals(dto.getId())))
                                     .count()
                     ))
-                    .peek(dto -> {
-                        List<RecommendedEventProto> protos = analyzerClient.getInteractionsCount(
-                                InteractionsCountRequestProto.newBuilder().addEventId(dto.getId()).build()
-                        );
-                        dto.setRating(protos.isEmpty() ? 0.0 : protos.getFirst().getScore());
-                    })
+                    .peek(dto -> eventRating.getOrDefault(dto.getId(), 0.0))
                     .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
@@ -235,11 +229,14 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     EventFullDto getViewsCounter(EventFullDto eventFullDto) {
         List<RecommendedEventProto> protos = analyzerClient.getInteractionsCount(
-                InteractionsCountRequestProto.newBuilder().addEventId(eventFullDto.getId()).build()
+                getInteractionsRequest(List.of(eventFullDto.getId()))
         );
         Double rating = protos.isEmpty() ? 0.0 : protos.getFirst().getScore();
         eventFullDto.setRating(rating);
         return eventFullDto;
     }
 
+    private InteractionsCountRequestProto getInteractionsRequest(List<Long> eventId) {
+        return InteractionsCountRequestProto.newBuilder().addAllEventId(eventId).build();
+    }
 }

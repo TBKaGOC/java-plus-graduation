@@ -10,8 +10,6 @@ import ru.practicum.stats.aggregator.starter.AggregatorStarter;
 @ConfigurationPropertiesScan
 public class AggregatorServer {
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(AggregatorServer.class, args);
-        AggregatorStarter starter = context.getBean(AggregatorStarter.class);
-        starter.start();
+        SpringApplication.run(AggregatorServer.class, args);
     }
 }
