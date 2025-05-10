@@ -20,11 +20,12 @@ import java.time.Duration;
 @AllArgsConstructor
 @Component
 @Slf4j
-public class AggregatorStarter {
+public class AggregatorStarter implements Runnable {
     final Consumer<String, UserActionAvro> consumer;
     final UserActionHandler handler;
 
-    public void start() {
+    @Override
+    public void run() {
         try {
             log.info("Получение данных");
             while (true) {
@@ -56,6 +57,8 @@ public class AggregatorStarter {
 
     @PostConstruct
     public void init() {
-        start();
+        Thread thread = new Thread(this);
+        thread.setName("aggregator");
+        thread.start();
     }
 }
